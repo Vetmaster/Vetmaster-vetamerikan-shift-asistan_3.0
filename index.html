@@ -1874,8 +1874,8 @@
         </div>
       </details>
       <div id="pushStatus" class="import-status">Push durumu: kontrol edilmedi.</div>
-      <button id="pushRefreshButton" type="button">Push token yenile</button>
-      <button id="pushTestButton" type="button">Push test gönder</button>
+      <button id="pushRefreshButton" class="admin-only" type="button">Push token yenile</button>
+      <button id="pushTestButton" class="admin-only" type="button">Push test gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
       <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.04.01.apk" download hidden>Android uygulamasını kur</a>
@@ -2419,6 +2419,8 @@
       els.calculationToolsAccordion.hidden = !isAdminUser();
       els.bicarbToolButton.hidden = !isAdminUser();
       els.calciumToolButton.hidden = !isAdminUser();
+      els.pushRefreshButton.hidden = !isAdminUser();
+      els.pushTestButton.hidden = !isAdminUser();
     }
 
     function appHistoryState(screen = "home", params = {}) {
