@@ -13,7 +13,8 @@ self.addEventListener("push", event => {
     renotify: true,
     data: payload.data || {},
     badge: "vetamerikan-logo.png",
-    icon: "vetamerikan-logo.png"
+    icon: "vetamerikan-logo.png",
+    image: "vetamerikan-logo.png"
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
