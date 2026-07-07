@@ -12,9 +12,9 @@ self.addEventListener("push", event => {
     tag: payload.notification_id || "vetamerikan-shift",
     renotify: true,
     data: payload.data || {},
-    badge: "vetamerikan-logo.png",
-    icon: "vetamerikan-logo.png",
-    image: "vetamerikan-logo.png"
+    badge: "app-icon-vas-calendar.svg",
+    icon: "app-icon-vas-calendar.svg",
+    image: "app-icon-vas-calendar.svg"
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
