@@ -1702,7 +1702,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.07.04.01.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.07.08.01.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <div class="search">
@@ -1878,7 +1878,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Push test gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.04.01.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.08.01.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -1929,11 +1929,11 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.07.04.01";
+    const appVersion = "2026.07.08.01";
     const appUpdateManifestUrls = [
+      "app-update.json",
       "https://hasansargin.github.io/vetamerikan-shift-asistan/app-update.json",
-      "https://hasansargin.github.io/Vetamerikan-Shift-Asistan/app-update.json",
-      "app-update.json"
+      "https://hasansargin.github.io/Vetamerikan-Shift-Asistan/app-update.json"
     ];
     const appUpdateDismissedKey = "vetamerikan-shift-update-dismissed-version";
     const notificationReadMarkerTitle = "__VSA_READ__";
@@ -2609,16 +2609,20 @@
     function updateAndroidInstallPrompt() {
       if (!els.androidInstallPrompt) return;
       if (pendingAppUpdate && localStorage.getItem(appUpdateDismissedKey) !== pendingAppUpdate.version) {
-        els.androidInstallTitle.textContent = "Android uygulamasının yeni sürümü var";
+        const isWebUpdate = pendingAppUpdate.kind === "web";
+        els.androidInstallTitle.textContent = isWebUpdate ? "Web sürümünün yenisi var" : "Android uygulamasının yeni sürümü var";
         els.androidInstallText.textContent = `Mevcut sürüm ${appVersion}; güncel sürüm ${pendingAppUpdate.version}.`;
-        els.androidInstallLink.textContent = "Güncel uygulamayı kur";
-        els.androidInstallLink.href = pendingAppUpdate.apkUrl;
+        els.androidInstallLink.textContent = isWebUpdate ? "Sayfayı yenile" : "Güncel uygulamayı kur";
+        els.androidInstallLink.href = isWebUpdate ? pendingAppUpdate.webUrl : pendingAppUpdate.apkUrl;
+        if (isWebUpdate) els.androidInstallLink.removeAttribute("download");
+        else els.androidInstallLink.setAttribute("download", "");
         els.androidInstallPrompt.hidden = false;
       } else {
         els.androidInstallTitle.textContent = "Android uygulaması hazır";
         els.androidInstallText.textContent = "Web yerine telefonuna APK olarak kurabilirsin.";
         els.androidInstallLink.textContent = "Uygulamayı kur";
         els.androidInstallLink.href = `Vetamerikan-Shift-Asistan-${appVersion}.apk`;
+        els.androidInstallLink.setAttribute("download", "");
         els.androidInstallPrompt.hidden = !shouldShowAndroidInstallPrompt();
       }
       if (els.drawerAndroidInstallLink) {
@@ -2651,22 +2655,40 @@
       }
     }
 
+    function cacheBustedUrl(value, version) {
+      try {
+        const url = new URL(value, location.href);
+        url.searchParams.set("v", version);
+        return url.href;
+      } catch {
+        return value || "";
+      }
+    }
+
     async function checkForAppUpdate() {
-      if (!isAndroidApp()) return;
+      const canCheck = isAndroidApp() || isAndroidBrowser() || /^https?:$/i.test(location.protocol);
+      if (!canCheck) return;
       const urls = [...appUpdateManifestUrls];
       if (window.AndroidPush?.getUpdateManifestUrl) {
         const nativeUrl = window.AndroidPush.getUpdateManifestUrl();
         if (nativeUrl) urls.unshift(nativeUrl);
       }
+      const seenUrls = new Set();
       for (const url of urls.filter(Boolean)) {
         try {
-          const response = await fetch(resolveUpdateUrl(url), { cache: "no-store" });
+          const manifestUrl = resolveUpdateUrl(url);
+          if (seenUrls.has(manifestUrl)) continue;
+          seenUrls.add(manifestUrl);
+          const response = await fetch(manifestUrl, { cache: "no-store" });
           if (!response.ok) continue;
           const data = await response.json();
           const latestVersion = String(data.version || "");
           const apkUrl = resolveUpdateUrl(data.apkUrl || data.apk || "", response.url);
-          if (latestVersion && apkUrl && compareVersions(latestVersion, appVersion) > 0) {
-            pendingAppUpdate = { version: latestVersion, apkUrl };
+          const webUrl = cacheBustedUrl(resolveUpdateUrl(data.webUrl || data.indexUrl || "index.html", response.url), latestVersion);
+          if (latestVersion && compareVersions(latestVersion, appVersion) > 0) {
+            const wantsApk = isAndroidApp() || isAndroidBrowser();
+            if (wantsApk && apkUrl) pendingAppUpdate = { kind: "android", version: latestVersion, apkUrl };
+            else pendingAppUpdate = { kind: "web", version: latestVersion, webUrl };
             updateAndroidInstallPrompt();
             return;
           }
