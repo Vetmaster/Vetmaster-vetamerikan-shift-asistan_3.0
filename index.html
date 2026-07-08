@@ -1702,7 +1702,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.07.08.03.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.07.08.04.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <div class="search">
@@ -1878,7 +1878,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Push test gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.08.03.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.08.04.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -1929,7 +1929,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.07.08.03";
+    const appVersion = "2026.07.08.04";
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://hasansargin.github.io/vetamerikan-shift-asistan/app-update.json",
@@ -2612,10 +2612,10 @@
         const isWebUpdate = pendingAppUpdate.kind === "web";
         els.androidInstallTitle.textContent = isWebUpdate ? "Web sürümünün yenisi var" : "Android uygulamasının yeni sürümü var";
         els.androidInstallText.textContent = `Mevcut sürüm ${appVersion}; güncel sürüm ${pendingAppUpdate.version}.`;
-        els.androidInstallLink.textContent = isWebUpdate ? "Sayfayı yenile" : "Güncel uygulamayı kur";
-        els.androidInstallLink.href = isWebUpdate ? pendingAppUpdate.webUrl : pendingAppUpdate.apkUrl;
-        if (isWebUpdate) els.androidInstallLink.removeAttribute("download");
-        else els.androidInstallLink.setAttribute("download", "");
+        els.androidInstallLink.textContent = isWebUpdate ? "Sayfayı yenile" : "Güncellemeyi indir";
+        els.androidInstallLink.href = "#";
+        els.androidInstallLink.removeAttribute("download");
+        els.androidInstallLink.dataset.updateUrl = isWebUpdate ? pendingAppUpdate.webUrl : pendingAppUpdate.apkUrl;
         els.androidInstallPrompt.hidden = false;
       } else {
         els.androidInstallTitle.textContent = "Android uygulaması hazır";
@@ -2623,6 +2623,7 @@
         els.androidInstallLink.textContent = "Uygulamayı kur";
         els.androidInstallLink.href = `Vetamerikan-Shift-Asistan-${appVersion}.apk`;
         els.androidInstallLink.setAttribute("download", "");
+        delete els.androidInstallLink.dataset.updateUrl;
         els.androidInstallPrompt.hidden = !shouldShowAndroidInstallPrompt();
       }
       if (els.drawerAndroidInstallLink) {
@@ -5876,9 +5877,26 @@
     els.notificationPromptAllow.addEventListener("click", requestNotifications);
     els.notificationPromptDismiss.addEventListener("click", dismissNotificationPrompt);
     els.androidInstallLink.addEventListener("click", event => {
-      if (pendingAppUpdate && window.AndroidPush?.openExternalUrl) {
+      const updateUrl = els.androidInstallLink.dataset.updateUrl || "";
+      if (pendingAppUpdate && updateUrl) {
         event.preventDefault();
-        window.AndroidPush.openExternalUrl(pendingAppUpdate.apkUrl);
+        const isWebUpdate = pendingAppUpdate.kind === "web";
+        const confirmed = window.confirm(isWebUpdate
+          ? "Yeni web sürümünü açmak istiyor musun?"
+          : "Yeni Android APK dosyasını indirmek istiyor musun?");
+        if (!confirmed) return;
+        localStorage.setItem(appUpdateDismissedKey, pendingAppUpdate.version);
+        if (isWebUpdate) {
+          window.location.href = updateUrl;
+          return;
+        }
+        if (window.AndroidPush?.openExternalUrl) window.AndroidPush.openExternalUrl(updateUrl);
+        else window.location.href = updateUrl;
+        return;
+      }
+      if (!window.confirm("Android uygulamasını indirmek istiyor musun?")) {
+        event.preventDefault();
+        return;
       }
       dismissAndroidInstallPrompt();
     });
