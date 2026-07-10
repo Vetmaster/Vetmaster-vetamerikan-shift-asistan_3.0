@@ -1671,7 +1671,7 @@
           <button id="homeButton" class="app-title" type="button" aria-label="Vetamerikan Shift Asistan ana sayfa">
             <img class="app-logo" src="vetamerikan-logo.png" alt="Vetamerikan">
             <span class="app-title-text">SHIFT ASİSTAN</span>
-            <span class="app-title-build">0.3</span>
+            <span class="app-title-build">3.0</span>
           </button>
         </h1>
         <span id="headerVersionLabel" class="app-title-version"></span>
@@ -1702,7 +1702,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.07.08.07.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.07.08.08.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <div class="search">
@@ -1878,7 +1878,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Push test gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.08.07.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.08.08.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -1908,6 +1908,7 @@
     const authStorageKey = "vetamerikan-shift-authenticated";
     const authUserStorageKey = "vetamerikan-shift-auth-user";
     const authUserCreatedAtStorageKey = "vetamerikan-shift-auth-user-created-at";
+    const authUserNotificationStartStorageKey = "vetamerikan-shift-auth-user-notification-start-at";
     const authUsersStorageKey = "vetamerikan-shift-users";
     const notificationStorageKey = "vetamerikan-shift-notifications-enabled";
     const notificationListStorageKey = "vetamerikan-shift-notification-list";
@@ -1929,7 +1930,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.07.08.07";
+    const appVersion = "2026.07.08.08";
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
@@ -2389,9 +2390,14 @@
     }
 
     function saveAuth(username, createdAt = "") {
+      const cleanUsername = authUsername(username);
       localStorage.setItem(authStorageKey, "1");
-      localStorage.setItem(authUserStorageKey, authUsername(username));
+      localStorage.setItem(authUserStorageKey, cleanUsername);
       if (createdAt) localStorage.setItem(authUserCreatedAtStorageKey, createdAt);
+      const notificationStartKey = `${authUserNotificationStartStorageKey}:${cleanUsername}`;
+      if (!localStorage.getItem(notificationStartKey)) {
+        localStorage.setItem(notificationStartKey, new Date().toISOString());
+      }
     }
 
     function clearAuth() {
@@ -2406,6 +2412,12 @@
 
     function currentUserCreatedAt() {
       return localStorage.getItem(authUserCreatedAtStorageKey) || "";
+    }
+
+    function currentUserNotificationStartAt() {
+      const username = currentUsername();
+      if (!username) return "";
+      return localStorage.getItem(`${authUserNotificationStartStorageKey}:${username}`) || currentUserCreatedAt();
     }
 
     function isAdminUser() {
@@ -3213,7 +3225,8 @@
     function notificationClearedAt() {
       const clearedAt = localStorage.getItem(notificationClearedAtStorageKey) || "";
       const createdAt = currentUserCreatedAt();
-      const timestamps = [clearedAt, createdAt]
+      const notificationStartAt = currentUserNotificationStartAt();
+      const timestamps = [clearedAt, createdAt, notificationStartAt]
         .map(value => new Date(value || 0).getTime())
         .filter(value => !Number.isNaN(value) && value > 0);
       if (!timestamps.length) return "";
