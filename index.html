@@ -1564,6 +1564,9 @@
       font-size: 12px;
       font-weight: 800;
     }
+    .drawer-tool-result small.result-danger {
+      color: #d92d20;
+    }
     .toast-area {
       position: fixed;
       left: 12px;
@@ -3246,7 +3249,7 @@
         ${doseLabel}: ${dose.toFixed(1)} mL %10 kalsiyum glukonat IV.
         <small>Hesap: ${weight.toFixed(1)} kg × ${dosePerKg} mL/kg. BSAVA acil doz aralığı 0.5-1.5 mL/kg.</small>
         <small>Serumun içinden eklenecek kalsiyum hacmi kadar sıvı çıkar: ${removeVolume.toFixed(1)} mL.</small>
-        <small>${fluidVolume} mL sıvı ${durationMinutes} dakikada verilecek: yaklaşık ${rate.toFixed(1)} mL/saat.</small>
+        <small class="result-danger">${fluidVolume} mL sıvı ${durationMinutes} dakikada verilecek: yaklaşık ${rate.toFixed(1)} mL/saat.</small>
       `;
     }
 
