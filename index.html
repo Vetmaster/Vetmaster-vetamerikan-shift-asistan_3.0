@@ -150,6 +150,11 @@
       flex-direction: column;
       overflow: visible;
     }
+    .app.message-mode {
+      height: 100svh;
+      max-height: 100svh;
+      overflow: hidden;
+    }
     .top {
       position: sticky;
       top: 0;
@@ -660,6 +665,12 @@
       align-content: start;
       gap: 14px;
     }
+    #messageView.message-thread-view {
+      display: flex;
+      flex-direction: column;
+      align-content: stretch;
+      overflow: hidden;
+    }
     .profile-head {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -938,6 +949,14 @@
       display: grid;
       gap: 10px;
     }
+    #messageView.message-thread-view .message-chat {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      align-content: end;
+      padding: 2px 2px 12px;
+      -webkit-overflow-scrolling: touch;
+    }
     .message-row {
       display: flex;
       align-items: end;
@@ -1148,6 +1167,13 @@
       gap: 8px;
       padding-top: 8px;
       background: var(--panel);
+    }
+    #messageView.message-thread-view .message-compose {
+      position: static;
+      flex: 0 0 auto;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      padding-bottom: max(0px, env(safe-area-inset-bottom));
     }
     .message-compose textarea {
       min-height: 44px;
@@ -1702,7 +1728,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.07.08.09.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.07.08.10.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <div class="search">
@@ -1878,7 +1904,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Push test gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.08.09.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.08.10.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -1930,7 +1956,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.07.08.09";
+    const appVersion = "2026.07.08.10";
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
@@ -4103,6 +4129,7 @@
       activeMessageSicil = null;
       activeMessagePeer = "";
       activeMessageReturnScreen = "";
+      els.messageView.classList.remove("message-thread-view");
       const threads = messageThreads();
       els.messageView.innerHTML = `
         <div class="profile-head-main">
@@ -4191,6 +4218,7 @@
       activeMessageSicil = String(sicil);
       activeMessagePeer = resolvedPeer;
       markThreadRead(sicil, resolvedPeer);
+      els.messageView.classList.add("message-thread-view");
       const backLabel = activeMessageReturnScreen === "profile" ? "‹ Geri" : "‹ Mesajlara dön";
       els.messageView.innerHTML = `
         <div class="profile-head-main">
@@ -4326,8 +4354,8 @@
         });
       });
       requestAnimationFrame(() => {
-        const rows = els.messageView.querySelectorAll(".message-row");
-        rows[rows.length - 1]?.scrollIntoView({ block: "end" });
+        const chat = els.messageView.querySelector(".message-chat");
+        if (chat) chat.scrollTop = chat.scrollHeight;
       });
     }
 
@@ -4356,6 +4384,7 @@
       activeMessagePeer = "";
       activeMessageReturnScreen = "";
       els.app.classList.remove("message-mode");
+      els.messageView.classList.remove("message-thread-view");
       els.messageView.hidden = true;
       els.messageView.innerHTML = "";
     }
