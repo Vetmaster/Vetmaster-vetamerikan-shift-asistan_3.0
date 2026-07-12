@@ -1544,6 +1544,20 @@
       grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
+    .drawer-tool-check {
+      display: flex !important;
+      grid-template-columns: none !important;
+      align-items: center;
+      gap: 8px !important;
+      color: var(--ink) !important;
+    }
+    .drawer-tool-check input {
+      width: 18px;
+      min-height: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      padding: 0;
+    }
     .drawer-tool-result {
       min-height: 42px;
       display: grid;
@@ -1565,6 +1579,15 @@
       font-weight: 800;
     }
     .drawer-tool-result small.result-danger {
+      color: #d92d20;
+    }
+    .drawer-tool-result .result-line {
+      display: block;
+    }
+    .drawer-tool-result .result-line + .result-line {
+      margin-top: 4px;
+    }
+    .drawer-tool-result .result-danger {
       color: #d92d20;
     }
     .toast-area {
@@ -1881,7 +1904,7 @@
           </select>
         </label>
         <label>
-          Sıvı hacmi
+          Verilmek istenen sıvı hacmi
           <select id="calciumFluidVolume">
             <option value="10">10 mL sıvı</option>
             <option value="20">20 mL sıvı</option>
@@ -1889,6 +1912,17 @@
             <option value="50">50 mL sıvı</option>
             <option value="75">75 mL sıvı</option>
             <option value="100">100 mL sıvı</option>
+          </select>
+        </label>
+        <label class="drawer-tool-check">
+          <input id="calciumPackageMode" type="checkbox">
+          Elimdeki serum paketine göre hesapla
+        </label>
+        <label id="calciumPackageLabel" hidden>
+          Serum paketi
+          <select id="calciumPackageVolume" disabled>
+            <option value="50">50 mL izotonik paket</option>
+            <option value="100" selected>100 mL izotonik paket</option>
           </select>
         </label>
         <label>
@@ -2342,6 +2376,9 @@
       calciumWeight: document.getElementById("calciumWeight"),
       calciumDose: document.getElementById("calciumDose"),
       calciumFluidVolume: document.getElementById("calciumFluidVolume"),
+      calciumPackageMode: document.getElementById("calciumPackageMode"),
+      calciumPackageLabel: document.getElementById("calciumPackageLabel"),
+      calciumPackageVolume: document.getElementById("calciumPackageVolume"),
       calciumDuration: document.getElementById("calciumDuration"),
       calciumResult: document.getElementById("calciumResult"),
       logoutButton: document.getElementById("logoutButton"),
@@ -3242,14 +3279,27 @@
       const fluidVolume = Number(els.calciumFluidVolume.value);
       const durationMinutes = Number(els.calciumDuration.value);
       const dose = weight * dosePerKg;
+      const baseFluidVolume = Math.max(0, fluidVolume - dose);
       const rate = fluidVolume / (durationMinutes / 60);
-      const removeVolume = Math.min(dose, fluidVolume);
+      const usePackageMode = Boolean(els.calciumPackageMode.checked);
+      const packageVolume = Number(els.calciumPackageVolume.value);
+      const packageCalciumVolume = baseFluidVolume > 0 ? packageVolume * dose / baseFluidVolume : 0;
+      const baseMixLine = usePackageMode
+        ? ""
+        : `<strong class="result-line">${baseFluidVolume.toFixed(1)} mL sıvı içine ${dose.toFixed(1)} mL Ca glukonat ekle.</strong>`;
+      const packageLine = usePackageMode
+        ? `<strong class="result-line">${packageVolume} mL izotonik paket içine ${packageCalciumVolume.toFixed(1)} mL Ca glukonat ekle.</strong>`
+        : "";
+      const rateLine = usePackageMode
+        ? `<strong class="result-line result-danger">Bu karışımdan ${fluidVolume} mL sıvı ${durationMinutes} dakikada verilecek. Hız: ${rate.toFixed(1)} mL/saat.</strong>`
+        : `<strong class="result-line result-danger">${fluidVolume} mL sıvı ${durationMinutes} dakikada verilecek. Hız: ${rate.toFixed(1)} mL/saat.</strong>`;
       const doseLabel = dosePerKg === 0.5 ? "Minimum doz" : dosePerKg === 1.5 ? "Maksimum doz" : "Orta doz";
       els.calciumResult.innerHTML = `
-        ${doseLabel}: ${dose.toFixed(1)} mL %10 kalsiyum glukonat IV.
-        <small>Hesap: ${weight.toFixed(1)} kg × ${dosePerKg} mL/kg. BSAVA acil doz aralığı 0.5-1.5 mL/kg.</small>
-        <small>Serumun içinden eklenecek kalsiyum hacmi kadar sıvı çıkar: ${removeVolume.toFixed(1)} mL.</small>
-        <small class="result-danger">${fluidVolume} mL sıvı ${durationMinutes} dakikada verilecek: yaklaşık ${rate.toFixed(1)} mL/saat.</small>
+        <strong class="result-line">${doseLabel}: ${dose.toFixed(1)} mL %10 kalsiyum glukonat IV.</strong>
+        <strong class="result-line">Hesap: ${weight.toFixed(1)} kg × ${dosePerKg} mL/kg. BSAVA acil doz aralığı 0.5-1.5 mL/kg.</strong>
+        ${baseMixLine}
+        ${packageLine}
+        ${rateLine}
       `;
     }
 
@@ -6039,7 +6089,13 @@
     });
     els.calciumWeight.addEventListener("input", calculateCalcium);
     els.calciumWeight.addEventListener("change", calculateCalcium);
-    [els.calciumDose, els.calciumFluidVolume, els.calciumDuration].forEach(input => {
+    els.calciumPackageMode.addEventListener("change", () => {
+      const packageModeEnabled = els.calciumPackageMode.checked;
+      els.calciumPackageLabel.hidden = !packageModeEnabled;
+      els.calciumPackageVolume.disabled = !packageModeEnabled;
+      calculateCalcium();
+    });
+    [els.calciumDose, els.calciumFluidVolume, els.calciumPackageVolume, els.calciumDuration].forEach(input => {
       input.addEventListener("input", calculateCalcium);
       input.addEventListener("change", calculateCalcium);
     });
