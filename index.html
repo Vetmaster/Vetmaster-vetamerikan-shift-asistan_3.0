@@ -949,12 +949,32 @@
       display: grid;
       gap: 10px;
     }
+    .message-separator {
+      justify-self: center;
+      max-width: 86%;
+      border: 1px solid rgba(148, 163, 184, .28);
+      border-radius: 999px;
+      background: #f8fafc;
+      color: var(--muted);
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.2;
+      text-align: center;
+    }
+    .message-separator.unread {
+      border-color: rgba(139, 92, 246, .24);
+      background: #f4efff;
+      color: #7c3aed;
+    }
     #messageView.message-thread-view .message-chat {
       flex: 1 1 auto;
       min-height: 0;
+      overflow-x: hidden;
       overflow-y: auto;
-      align-content: end;
+      align-content: start;
       padding: 2px 2px 12px;
+      touch-action: pan-y;
       -webkit-overflow-scrolling: touch;
     }
     .message-row {
@@ -2194,6 +2214,7 @@
       "mehmet kızılkuyu": "Mobil Hizmet"
     };
     const extensionOverrides = {
+      "emine esma cerez": "6429",
       "nihan dikbas tsatsaronis": "6498",
       "burak gumurcunler": "6471",
       "yagmur kocak": "6448",
@@ -3570,6 +3591,62 @@
       return notificationTimeLabel(createdAt);
     }
 
+    function messageDayKey(createdAt) {
+      const date = new Date(createdAt);
+      if (Number.isNaN(date.getTime())) return "";
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function messageDateSeparatorLabel(createdAt) {
+      const date = new Date(createdAt);
+      if (Number.isNaN(date.getTime())) return "";
+      const today = new Date();
+      const dayStart = value => new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
+      const diffDays = Math.round((dayStart(today) - dayStart(date)) / (24 * 60 * 60 * 1000));
+      if (diffDays === 0) return "Bugün";
+      if (diffDays === 1) return "Dün";
+      return date.toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "long" });
+    }
+
+    function isUnreadIncomingMessage(item) {
+      return !item.read
+        && !item.readAt
+        && messageUser(item.toUser) === messageUser(currentUsername())
+        && messageUser(item.sender || item.fromUser) !== messageUser(currentUsername());
+    }
+
+    function messageThreadItemsMarkup(messages, peerName, firstUnreadMessageId = "") {
+      let lastDayKey = "";
+      const parts = [];
+      messages.forEach(item => {
+        const dayKey = messageDayKey(item.createdAt);
+        if (dayKey && dayKey !== lastDayKey) {
+          lastDayKey = dayKey;
+          parts.push(`<div class="message-separator">${escapeHtml(messageDateSeparatorLabel(item.createdAt))}</div>`);
+        }
+        if (firstUnreadMessageId && String(item.id) === String(firstUnreadMessageId)) {
+          parts.push('<div class="message-separator unread">Okunmamış mesajlar</div>');
+        }
+        const isMine = messageUser(item.sender || item.fromUser) === messageUser(currentUsername());
+        const authorName = isMine ? displayNameForUser(currentUsername()) : messageAuthorDisplay(item, peerName);
+        const authorUser = isMine ? currentUsername() : (item.sender || item.fromUser);
+        parts.push(`
+          <div class="message-row${isMine ? " mine" : ""}">
+            <div class="message-avatar" aria-label="${escapeHtml(authorName)}">${escapeHtml(messageAvatarInitials(authorUser, authorName))}</div>
+            <article class="message-bubble${isMine ? " mine" : ""}" data-message-id="${escapeHtml(item.id)}" data-can-like="${isMine ? "0" : "1"}">
+              <button class="message-bubble-menu-button" type="button" data-message-action-id="${escapeHtml(item.id)}" aria-label="Mesaj seçenekleri">⌄</button>
+              <p>${escapeHtml(item.body)}</p>
+              <small>${escapeHtml(authorName)} · ${escapeHtml(messageTimeLabel(item.createdAt))}</small>
+              ${messageStatusMarkup(item)}
+              ${messageLikeMarkup(item, isMine)}
+              ${messageReactionPickerMarkup(item, isMine)}
+            </article>
+          </div>
+        `);
+      });
+      return parts.join("");
+    }
+
     function relativeTimeLabel(value) {
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return "";
@@ -4212,6 +4289,7 @@
       activeMessageReturnScreen = returnScreen;
       if (options.pushHistory !== false) pushAppHistory("message-thread", { sicil: String(sicil), peer: resolvedPeer, from: returnScreen });
       const messages = messagesForConversation(sicil, resolvedPeer);
+      const firstUnreadMessageId = messages.find(isUnreadIncomingMessage)?.id || "";
       const doctorName = row?.name || messages[0]?.doctorName || "Hekim";
       const peerName = isGenericMessageUser(resolvedPeer) ? doctorName : displayNameForUser(resolvedPeer);
       const peerInitialSource = resolvedPeer || peerName;
@@ -4236,24 +4314,7 @@
           </div>
         </div>
         <div class="message-chat">
-          ${messages.length ? messages.map(item => {
-            const isMine = messageUser(item.sender || item.fromUser) === messageUser(currentUsername());
-            const authorName = isMine ? displayNameForUser(currentUsername()) : messageAuthorDisplay(item, peerName);
-            const authorUser = isMine ? currentUsername() : (item.sender || item.fromUser);
-            return `
-            <div class="message-row${isMine ? " mine" : ""}">
-              <div class="message-avatar" aria-label="${escapeHtml(authorName)}">${escapeHtml(messageAvatarInitials(authorUser, authorName))}</div>
-              <article class="message-bubble${isMine ? " mine" : ""}" data-message-id="${escapeHtml(item.id)}" data-can-like="${isMine ? "0" : "1"}">
-                <button class="message-bubble-menu-button" type="button" data-message-action-id="${escapeHtml(item.id)}" aria-label="Mesaj seçenekleri">⌄</button>
-                <p>${escapeHtml(item.body)}</p>
-                <small>${escapeHtml(authorName)} · ${escapeHtml(messageTimeLabel(item.createdAt))}</small>
-                ${messageStatusMarkup(item)}
-                ${messageLikeMarkup(item, isMine)}
-                ${messageReactionPickerMarkup(item, isMine)}
-              </article>
-            </div>
-          `;
-          }).join("") : '<div class="empty">Bu hekimle henüz mesaj yok.</div>'}
+          ${messages.length ? messageThreadItemsMarkup(messages, peerName, firstUnreadMessageId) : '<div class="empty">Bu hekimle henüz mesaj yok.</div>'}
         </div>
         <form id="messageComposeForm" class="message-compose">
           <textarea id="messageText" placeholder="Mesaj yaz" rows="1"></textarea>
