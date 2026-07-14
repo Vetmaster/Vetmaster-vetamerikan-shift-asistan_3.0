@@ -1423,9 +1423,10 @@
     }
     .import-body {
       padding: 14px;
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 8px;
-      align-content: start;
+      min-height: 0;
       overflow: auto;
     }
     .import-body input,
@@ -1447,18 +1448,24 @@
       resize: vertical;
       line-height: 1.35;
     }
+    .import-body .push-test-message {
+      min-height: 58px;
+    }
     .import-body button {
-      background: var(--brand);
-      border-color: var(--brand);
+      background: #b796cc;
+      border-color: #b796cc;
       color: #fff;
       font-weight: 900;
     }
+    .import-body #logoutButton {
+      margin-top: auto;
+    }
     .drawer-install-link {
       min-height: 44px;
-      border: 1px solid var(--brand);
+      border: 1px solid #b796cc;
       border-radius: 8px;
-      background: linear-gradient(135deg, #e7f5f6, #f7fafc);
-      color: var(--brand);
+      background: #b796cc;
+      color: #fff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1957,8 +1964,8 @@
         </div>
       </details>
       <div id="pushStatus" class="import-status">Push durumu: kontrol edilmedi.</div>
-      <button id="pushRefreshButton" class="admin-only" type="button">Push token yenile</button>
-      <button id="pushTestButton" class="admin-only" type="button">Push test gönder</button>
+      <textarea id="pushTestMessage" class="admin-only push-test-message" rows="2" placeholder="Gönderilecek push mesajı"></textarea>
+      <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
       <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.07.08.10.apk" download hidden>Android uygulamasını kur</a>
@@ -2395,7 +2402,7 @@
       codeMenuClose: document.getElementById("codeMenuClose"),
       toastArea: document.getElementById("toastArea"),
       pushStatus: document.getElementById("pushStatus"),
-      pushRefreshButton: document.getElementById("pushRefreshButton"),
+      pushTestMessage: document.getElementById("pushTestMessage"),
       pushTestButton: document.getElementById("pushTestButton"),
       notificationPermissionPrompt: document.getElementById("notificationPermissionPrompt"),
       notificationPromptAllow: document.getElementById("notificationPromptAllow"),
@@ -2529,7 +2536,7 @@
       els.calculationToolsAccordion.hidden = !isAdminUser();
       els.bicarbToolButton.hidden = !isAdminUser();
       els.calciumToolButton.hidden = !isAdminUser();
-      els.pushRefreshButton.hidden = !isAdminUser();
+      els.pushTestMessage.hidden = !isAdminUser();
       els.pushTestButton.hidden = !isAdminUser();
     }
 
@@ -4836,10 +4843,11 @@
     }
 
     function sendPushTestNotification() {
+      const body = els.pushTestMessage.value.trim() || "Push test bildirimi.";
       sendPushNotification({
         id: `push-test-${Date.now()}`,
         title: "Vetamerikan Shift Asistan",
-        body: "Push test bildirimi."
+        body
       }, { includeCurrentUser: true });
     }
 
@@ -6071,7 +6079,6 @@
       dismissAndroidInstallPrompt();
     });
     els.androidInstallDismiss.addEventListener("click", dismissAndroidInstallPrompt);
-    els.pushRefreshButton.addEventListener("click", requestAndroidPushToken);
     els.pushTestButton.addEventListener("click", sendPushTestNotification);
     els.excelImportButton.addEventListener("click", importExcelFile);
     els.bicarbToolButton.addEventListener("click", openBicarbonateTool);
