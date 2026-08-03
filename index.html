@@ -1872,6 +1872,8 @@
       color: #fff;
     }
     .story-progress {
+      position: relative;
+      z-index: 5;
       height: 4px;
       border-radius: 999px;
       background: rgba(255, 255, 255, .22);
@@ -1885,6 +1887,8 @@
       border-radius: inherit;
     }
     .story-viewer-head {
+      position: relative;
+      z-index: 5;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -1932,6 +1936,8 @@
     }
     .story-image-wrap img,
     .story-image-wrap video {
+      position: relative;
+      z-index: 1;
       max-width: 100%;
       max-height: 100%;
       border-radius: 8px;
@@ -1940,10 +1946,10 @@
       background: #05070d;
     }
     .story-nav-zone {
-      position: absolute;
+      position: fixed;
       top: 0;
       bottom: 0;
-      z-index: 3;
+      z-index: 2;
       width: 50%;
       border: 0;
       padding: 0;
@@ -1974,6 +1980,8 @@
       min-height: 15px;
     }
     .story-viewer-foot {
+      position: relative;
+      z-index: 5;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -2004,6 +2012,15 @@
       border: 1px solid rgba(255, 255, 255, .28);
       border-radius: 999px;
       background: rgba(255, 255, 255, .14);
+      color: #fff;
+      font-weight: 900;
+    }
+    .story-delete {
+      min-width: 66px;
+      min-height: 42px;
+      border: 1px solid rgba(255, 255, 255, .3);
+      border-radius: 999px;
+      background: rgba(239, 68, 68, .86);
       color: #fff;
       font-weight: 900;
     }
@@ -2372,6 +2389,7 @@
     <div class="story-viewer-foot">
       <p id="storyViewerCaption">Defekasyon görüldü</p>
       <div class="story-viewer-actions">
+        <button id="storyDeleteButton" class="story-delete" type="button" hidden>Sil</button>
         <button id="storyDownloadButton" class="story-download" type="button">İndir</button>
         <button id="storyPauseButton" class="story-pause" type="button">Duraklat</button>
       </div>
@@ -2891,6 +2909,7 @@
       storyNextZone: document.getElementById("storyNextZone"),
       storyViewerCaption: document.getElementById("storyViewerCaption"),
       storyCloseButton: document.getElementById("storyCloseButton"),
+      storyDeleteButton: document.getElementById("storyDeleteButton"),
       storyDownloadButton: document.getElementById("storyDownloadButton"),
       storyPauseButton: document.getElementById("storyPauseButton"),
       storyCameraModal: document.getElementById("storyCameraModal"),
@@ -5509,6 +5528,7 @@
       const authorName = story.author ? displayNameForUser(story.author) : "Kullanıcı";
       els.storyViewerMeta.textContent = `${authorName} tarafından ${relativeStoryTimeLabel(story.createdAt)} paylaşıldı`;
       els.storyViewerCaption.textContent = story.caption || "Defekasyon görüldü";
+      els.storyDeleteButton.hidden = !canDeleteStory(story);
       els.storyPauseButton.textContent = storyPaused ? "Devam" : "Duraklat";
       const progress = Math.max(0, Math.min(100, ((storyDurationMs - storyRemainingMs) / storyDurationMs) * 100));
       els.storyProgressBar.style.width = `${progress}%`;
@@ -5601,6 +5621,36 @@
       document.body.appendChild(link);
       link.click();
       link.remove();
+    }
+
+    function canDeleteStory(story) {
+      if (!story) return false;
+      return isAdminUser() || messageUser(story.author) === messageUser(currentUsername());
+    }
+
+    async function deleteActiveStory() {
+      const story = clinicStories[activeStoryIndex];
+      if (!canDeleteStory(story)) return;
+      if (!window.confirm("Bu story silinsin mi?")) return;
+      const id = String(story.id || "");
+      const nextIndex = activeStoryIndex >= clinicStories.length - 1 ? activeStoryIndex - 1 : activeStoryIndex;
+      try {
+        clinicStories = clinicStories.filter(item => item.id !== id);
+        renderStoryStrip();
+        if (clinicStories.length && nextIndex >= 0) {
+          openStoryViewer(nextIndex);
+        } else {
+          closeStoryViewer();
+        }
+        await supabaseRequest(`${storyTable}?id=eq.${encodeURIComponent(id)}`, {
+          method: "DELETE",
+          headers: { Prefer: "return=minimal" }
+        });
+        setStoryAdminStatus("Story silindi.");
+      } catch (error) {
+        setStoryAdminStatus(`Story silinemedi: ${error.message}`);
+        await loadSupabaseStories({ silent: true });
+      }
     }
 
     function fileToDataUrl(file, errorMessage = "Dosya okunamadı.") {
@@ -7100,6 +7150,7 @@
     els.excelImportButton.addEventListener("click", importExcelFile);
     els.storyImageFile.addEventListener("change", handleStoryMediaSelected);
     els.storyCloseButton.addEventListener("click", closeStoryViewer);
+    els.storyDeleteButton.addEventListener("click", deleteActiveStory);
     els.storyDownloadButton.addEventListener("click", downloadActiveStory);
     els.storyPauseButton.addEventListener("click", toggleStoryPause);
     els.storyPrevZone.addEventListener("click", () => changeStory(-1));
