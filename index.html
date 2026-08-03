@@ -5439,11 +5439,7 @@
     }
 
     function storyThumbMarkup(story) {
-      const media = escapeHtml(story.imageData);
-      if (isStoryVideo(story.imageData)) {
-        return `<video src="${media}" muted playsinline preload="metadata"></video>`;
-      }
-      return `<img src="${media}" alt="">`;
+      return `<img src="${storyAuthorAvatarSrc(story.author)}" alt="">`;
     }
 
     function storyAuthorAvatarSrc(author) {
