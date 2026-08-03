@@ -1762,6 +1762,9 @@
       gap: 5px;
       text-align: center;
     }
+    .story-add-button {
+      position: relative;
+    }
     .story-thumb {
       width: 64px;
       height: 64px;
@@ -1770,7 +1773,25 @@
       border-radius: 50%;
       background: linear-gradient(135deg, #b796cc, #243f7a);
     }
-    .story-thumb img {
+    .story-add-button .story-thumb {
+      position: relative;
+      background: #101522;
+    }
+    .story-thumb-initials {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #243f7a, #b796cc);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+    .story-thumb img,
+    .story-thumb video {
       width: 100%;
       height: 100%;
       border-radius: 50%;
@@ -1778,6 +1799,26 @@
       object-fit: cover;
       display: block;
       background: #eef2f7;
+    }
+    .story-thumb video {
+      pointer-events: none;
+    }
+    .story-plus-badge {
+      position: absolute;
+      right: 2px;
+      bottom: 16px;
+      width: 27px;
+      height: 27px;
+      border: 3px solid var(--panel);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      color: #05070d;
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, .2);
     }
     .story-button span {
       overflow: hidden;
@@ -1791,6 +1832,7 @@
       font-size: 12px;
       font-weight: 800;
       padding: 4px 0;
+      align-self: center;
     }
     .story-viewer {
       position: fixed;
@@ -1861,12 +1903,35 @@
       display: grid;
       place-items: center;
     }
-    .story-image-wrap img {
+    .story-image-wrap img,
+    .story-image-wrap video {
       max-width: 100%;
       max-height: 100%;
       border-radius: 8px;
       object-fit: contain;
       box-shadow: 0 18px 40px rgba(0, 0, 0, .32);
+      background: #05070d;
+    }
+    .story-camera-row {
+      display: grid;
+      gap: 6px;
+    }
+    .story-camera-input {
+      position: fixed;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .story-camera-note,
+    .story-selected-media {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+    .story-selected-media {
+      min-height: 15px;
     }
     .story-viewer-foot {
       display: flex;
@@ -1879,6 +1944,11 @@
       font-size: 15px;
       font-weight: 900;
     }
+    .story-viewer-actions {
+      display: flex;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
     .story-pause {
       min-width: 102px;
       min-height: 42px;
@@ -1886,6 +1956,15 @@
       border-radius: 999px;
       background: #fff;
       color: var(--ink);
+      font-weight: 900;
+    }
+    .story-download {
+      min-width: 76px;
+      min-height: 42px;
+      border: 1px solid rgba(255, 255, 255, .28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .14);
+      color: #fff;
       font-weight: 900;
     }
     @media (max-width: 520px) {
@@ -1965,9 +2044,11 @@
           <strong>Klinik story</strong>
           <small id="storyCountLabel">0 paylaşım</small>
         </div>
+        <input id="storyImageFile" class="story-camera-input" type="file" accept="image/*,video/*" capture="environment">
         <div id="storyTrack" class="story-track">
           <div class="story-empty">Henüz paylaşım yok.</div>
         </div>
+        <div id="storyAdminStatus" class="import-status"></div>
       </section>
       <div class="search">
         <input id="searchInput" type="search" placeholder="Hekim ara" autocomplete="off">
@@ -2141,19 +2222,6 @@
         <button id="excelImportButton" type="button">Excel yükle ve database oluştur</button>
         <div id="importStatus" class="import-status"></div>
       </div>
-      <div id="storyAdminTools" class="drawer-tool admin-only" aria-label="Klinik story paylaş">
-        <h3>Klinik story paylaş</h3>
-        <label>
-          Hasta adı
-          <input id="storyPatientName" type="text" placeholder="Örn. Pamuk">
-        </label>
-        <label>
-          Fotoğraf
-          <input id="storyImageFile" type="file" accept="image/*">
-        </label>
-        <button id="storyShareButton" type="button">Defekasyon görüldü paylaş</button>
-        <div id="storyAdminStatus" class="import-status"></div>
-      </div>
       <details id="calculationToolsAccordion" class="tools-accordion admin-only">
         <summary>Hesaplama araçları</summary>
         <div class="tools-accordion-body">
@@ -2193,10 +2261,14 @@
     </div>
     <div class="story-image-wrap">
       <img id="storyViewerImage" alt="">
+      <video id="storyViewerVideo" muted playsinline hidden></video>
     </div>
     <div class="story-viewer-foot">
       <p id="storyViewerCaption">Defekasyon görüldü</p>
-      <button id="storyPauseButton" class="story-pause" type="button">Duraklat</button>
+      <div class="story-viewer-actions">
+        <button id="storyDownloadButton" class="story-download" type="button">İndir</button>
+        <button id="storyPauseButton" class="story-pause" type="button">Duraklat</button>
+      </div>
     </div>
   </div>
   <div id="notificationPermissionPrompt" class="notification-permission" hidden>
@@ -2239,6 +2311,7 @@
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
     const appVersion = "2026.08.03.05";
     const storyDurationMs = 15000;
+    const storyLifetimeMs = 24 * 60 * 60 * 1000;
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
@@ -2578,6 +2651,7 @@
     let storyLastTick = 0;
     let storyPaused = false;
     let storyTimer = null;
+    let storyUploadBusy = false;
     let hasLoadedRemoteOverrides = false;
     let suppressAddonNotifications = false;
     const pendingOverrideKeys = new Set();
@@ -2637,10 +2711,7 @@
       excelDatabaseTools: document.getElementById("excelDatabaseTools"),
       excelFile: document.getElementById("excelFile"),
       excelImportButton: document.getElementById("excelImportButton"),
-      storyAdminTools: document.getElementById("storyAdminTools"),
-      storyPatientName: document.getElementById("storyPatientName"),
       storyImageFile: document.getElementById("storyImageFile"),
-      storyShareButton: document.getElementById("storyShareButton"),
       storyAdminStatus: document.getElementById("storyAdminStatus"),
       calculationToolsAccordion: document.getElementById("calculationToolsAccordion"),
       bicarbToolButton: document.getElementById("bicarbToolButton"),
@@ -2693,8 +2764,10 @@
       storyViewerPatient: document.getElementById("storyViewerPatient"),
       storyViewerMeta: document.getElementById("storyViewerMeta"),
       storyViewerImage: document.getElementById("storyViewerImage"),
+      storyViewerVideo: document.getElementById("storyViewerVideo"),
       storyViewerCaption: document.getElementById("storyViewerCaption"),
       storyCloseButton: document.getElementById("storyCloseButton"),
+      storyDownloadButton: document.getElementById("storyDownloadButton"),
       storyPauseButton: document.getElementById("storyPauseButton")
     };
 
@@ -2815,8 +2888,8 @@
     }
 
     function updateAdminVisibility() {
+      els.storySection.hidden = !isAdminUser();
       els.excelDatabaseTools.hidden = !isAdminUser();
-      els.storyAdminTools.hidden = !isAdminUser();
       els.calculationToolsAccordion.hidden = !isAdminUser();
       els.bicarbToolButton.hidden = !isAdminUser();
       els.calciumToolButton.hidden = !isAdminUser();
@@ -5146,9 +5219,14 @@
       };
     }
 
+    function isStoryVisible(item) {
+      return Date.now() - safeTimeValue(item.createdAt) <= storyLifetimeMs;
+    }
+
     function sortStories(items) {
       return [...items]
         .filter(item => item.id && item.imageData)
+        .filter(isStoryVisible)
         .sort((a, b) => safeTimeValue(b.createdAt) - safeTimeValue(a.createdAt))
         .slice(0, 40);
     }
@@ -5161,20 +5239,43 @@
       renderStoryStrip();
     }
 
+    function isStoryVideo(dataUrl = "") {
+      return String(dataUrl).startsWith("data:video/");
+    }
+
+    function storyThumbMarkup(story) {
+      const media = escapeHtml(story.imageData);
+      if (isStoryVideo(story.imageData)) {
+        return `<video src="${media}" muted playsinline preload="metadata"></video>`;
+      }
+      return `<img src="${media}" alt="">`;
+    }
+
+    function storyAddButtonMarkup() {
+      const initials = escapeHtml(messageInitials(currentUsername()) || "AD");
+      return `
+        <button class="story-button story-add-button" type="button" data-story-add aria-label="Hikaye ekle">
+          <span class="story-thumb">
+            <span class="story-thumb-initials">${initials}</span>
+          </span>
+          <span class="story-plus-badge" aria-hidden="true">+</span>
+          <span>Hikayem</span>
+        </button>
+      `;
+    }
+
     function renderStoryStrip() {
       if (!els.storyTrack) return;
       const count = clinicStories.length;
       els.storyCountLabel.textContent = `${count} paylaşım`;
-      if (!count) {
-        els.storyTrack.innerHTML = '<div class="story-empty">Henüz paylaşım yok.</div>';
-        return;
-      }
-      els.storyTrack.innerHTML = clinicStories.map((story, index) => `
+      const storyButtons = clinicStories.map((story, index) => `
         <button class="story-button" type="button" data-story-index="${index}" aria-label="${escapeHtml(story.patientName)} story">
-          <span class="story-thumb"><img src="${escapeHtml(story.imageData)}" alt=""></span>
+          <span class="story-thumb">${storyThumbMarkup(story)}</span>
           <span>${escapeHtml(story.patientName)}</span>
         </button>
       `).join("");
+      els.storyTrack.innerHTML = `${storyAddButtonMarkup()}${storyButtons || '<div class="story-empty">Henüz paylaşım yok.</div>'}`;
+      els.storyTrack.querySelector("[data-story-add]")?.addEventListener("click", openStoryCamera);
       els.storyTrack.querySelectorAll("[data-story-index]").forEach(button => {
         button.addEventListener("click", () => openStoryViewer(Number(button.dataset.storyIndex || 0)));
       });
@@ -5183,10 +5284,27 @@
     function renderStoryViewer() {
       const story = clinicStories[activeStoryIndex];
       if (!story) return;
-      els.storyViewerAvatar.src = story.imageData;
-      els.storyViewerImage.src = story.imageData;
+      els.storyViewerAvatar.src = isStoryVideo(story.imageData) ? "app-icon-vas-calendar.svg" : story.imageData;
+      if (isStoryVideo(story.imageData)) {
+        els.storyViewerImage.hidden = true;
+        els.storyViewerImage.removeAttribute("src");
+        els.storyViewerVideo.hidden = false;
+        if (els.storyViewerVideo.src !== story.imageData) {
+          els.storyViewerVideo.src = story.imageData;
+          els.storyViewerVideo.currentTime = 0;
+        }
+        if (storyPaused) els.storyViewerVideo.pause();
+        else els.storyViewerVideo.play().catch(() => {});
+      } else {
+        els.storyViewerVideo.pause();
+        els.storyViewerVideo.hidden = true;
+        els.storyViewerVideo.removeAttribute("src");
+        els.storyViewerImage.hidden = false;
+        els.storyViewerImage.src = story.imageData;
+      }
       els.storyViewerPatient.textContent = story.patientName;
-      els.storyViewerMeta.textContent = `${notificationTimeLabel(story.createdAt)} paylaşıldı`;
+      const authorName = story.author ? displayNameForUser(story.author) : "Kullanıcı";
+      els.storyViewerMeta.textContent = `${notificationTimeLabel(story.createdAt)} ${authorName} tarafından paylaşıldı`;
       els.storyViewerCaption.textContent = story.caption || "Defekasyon görüldü";
       els.storyPauseButton.textContent = storyPaused ? "Devam" : "Duraklat";
       const progress = Math.max(0, Math.min(100, ((storyDurationMs - storyRemainingMs) / storyDurationMs) * 100));
@@ -5234,21 +5352,54 @@
       activeStoryIndex = -1;
       els.storyViewer.hidden = true;
       els.storyProgressBar.style.width = "0%";
+      els.storyViewerVideo.pause();
+      els.storyViewerVideo.removeAttribute("src");
     }
 
     function toggleStoryPause() {
       storyPaused = !storyPaused;
       storyLastTick = Date.now();
+      if (!els.storyViewerVideo.hidden) {
+        if (storyPaused) els.storyViewerVideo.pause();
+        else els.storyViewerVideo.play().catch(() => {});
+      }
       renderStoryViewer();
     }
 
-    function imageFileToDataUrl(file) {
+    function storyDownloadExtension(dataUrl = "") {
+      const match = String(dataUrl).match(/^data:([^;]+);/);
+      const mime = match?.[1] || "";
+      if (mime.includes("png")) return "png";
+      if (mime.includes("webp")) return "webp";
+      if (mime.includes("mp4")) return "mp4";
+      if (mime.includes("quicktime")) return "mov";
+      if (mime.startsWith("video/")) return "video";
+      return "jpg";
+    }
+
+    function downloadActiveStory() {
+      const story = clinicStories[activeStoryIndex];
+      if (!story?.imageData) return;
+      const safePatient = norm(story.patientName || "hasta").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "hasta";
+      const link = document.createElement("a");
+      link.href = story.imageData;
+      link.download = `${safePatient}-story.${storyDownloadExtension(story.imageData)}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    function fileToDataUrl(file, errorMessage = "Dosya okunamadı.") {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(String(reader.result || ""));
-        reader.onerror = () => reject(new Error("Fotoğraf okunamadı."));
+        reader.onerror = () => reject(new Error(errorMessage));
         reader.readAsDataURL(file);
       });
+    }
+
+    function imageFileToDataUrl(file) {
+      return fileToDataUrl(file, "Fotoğraf okunamadı.");
     }
 
     function loadImageElement(src) {
@@ -5273,18 +5424,72 @@
       return canvas.toDataURL("image/jpeg", 0.82);
     }
 
-    async function shareDefecationStory() {
-      if (!isAdminUser()) return;
-      const patientName = els.storyPatientName.value.trim();
+    function getVideoDuration(file) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.onloadedmetadata = () => {
+          URL.revokeObjectURL(url);
+          resolve(Number(video.duration || 0));
+        };
+        video.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error("Video süresi okunamadı."));
+        };
+        video.src = url;
+      });
+    }
+
+    async function prepareStoryMedia(file) {
+      if (file.type.startsWith("image/")) return resizeStoryImage(file);
+      if (file.type.startsWith("video/")) {
+        const maxVideoBytes = 15 * 1024 * 1024;
+        if (file.size > maxVideoBytes) {
+          throw new Error("Video dosyası 15 MB'dan küçük olmalı.");
+        }
+        const duration = await getVideoDuration(file);
+        if (!duration || duration > 15.5) {
+          throw new Error("Video 15 saniyeyi geçmemeli.");
+        }
+        return fileToDataUrl(file, "Video okunamadı.");
+      }
+      throw new Error("Sadece fotoğraf veya video paylaşılabilir.");
+    }
+
+    function setStoryAdminStatus(message = "") {
+      if (els.storyAdminStatus) els.storyAdminStatus.textContent = message;
+    }
+
+    function openStoryCamera() {
+      if (!isAdminUser() || storyUploadBusy) return;
+      setStoryAdminStatus("");
+      els.storyImageFile.value = "";
+      els.storyImageFile.click();
+    }
+
+    async function handleStoryMediaSelected() {
       const file = els.storyImageFile.files?.[0];
+      if (!file) return;
+      const patientName = window.prompt("Hasta adı", "")?.trim();
+      if (!patientName) {
+        els.storyImageFile.value = "";
+        setStoryAdminStatus("Story paylaşmak için hasta adı girilmeli.");
+        return;
+      }
+      await shareDefecationStory(patientName, file);
+    }
+
+    async function shareDefecationStory(patientName, file) {
+      if (!isAdminUser()) return;
       if (!patientName || !file) {
-        els.storyAdminStatus.textContent = "Hasta adı ve fotoğraf seçilmeli.";
+        setStoryAdminStatus("Hasta adı ve medya seçilmeli.");
         return;
       }
       try {
-        els.storyShareButton.disabled = true;
-        els.storyAdminStatus.textContent = "Fotoğraf hazırlanıyor...";
-        const imageData = await resizeStoryImage(file);
+        storyUploadBusy = true;
+        setStoryAdminStatus("Medya hazırlanıyor...");
+        const imageData = await prepareStoryMedia(file);
         const item = {
           id: `story-${Date.now()}-${Math.random().toString(16).slice(2)}`,
           patientName,
@@ -5294,7 +5499,7 @@
           createdAt: new Date().toISOString()
         };
         upsertClinicStory(item);
-        els.storyAdminStatus.textContent = "Supabase'e kaydediliyor...";
+        setStoryAdminStatus("Supabase'e kaydediliyor...");
         await supabaseRequest(`${storyTable}?on_conflict=id`, {
           method: "POST",
           headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
@@ -5307,13 +5512,12 @@
             created_at: item.createdAt
           })
         });
-        els.storyPatientName.value = "";
         els.storyImageFile.value = "";
-        els.storyAdminStatus.textContent = "Story paylaşıldı.";
+        setStoryAdminStatus("Story paylaşıldı.");
       } catch (error) {
-        els.storyAdminStatus.textContent = `Story paylaşılamadı: ${error.message}`;
+        setStoryAdminStatus(`Story paylaşılamadı: ${error.message}`);
       } finally {
-        els.storyShareButton.disabled = false;
+        storyUploadBusy = false;
       }
     }
 
@@ -6586,9 +6790,13 @@
     els.androidInstallDismiss.addEventListener("click", dismissAndroidInstallPrompt);
     els.pushTestButton.addEventListener("click", sendPushTestNotification);
     els.excelImportButton.addEventListener("click", importExcelFile);
-    els.storyShareButton.addEventListener("click", shareDefecationStory);
+    els.storyImageFile.addEventListener("change", handleStoryMediaSelected);
     els.storyCloseButton.addEventListener("click", closeStoryViewer);
+    els.storyDownloadButton.addEventListener("click", downloadActiveStory);
     els.storyPauseButton.addEventListener("click", toggleStoryPause);
+    els.storyViewerVideo.addEventListener("ended", () => {
+      if (!storyPaused) openStoryViewer(activeStoryIndex + 1);
+    });
     els.storyViewer.addEventListener("click", event => {
       if (event.target === els.storyViewer) closeStoryViewer();
     });
