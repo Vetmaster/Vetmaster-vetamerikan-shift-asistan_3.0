@@ -1712,6 +1712,182 @@
       background: #fff;
       color: var(--brand);
     }
+    .story-section {
+      margin: 0 0 12px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .app.profile-mode .story-section,
+    .app.notification-mode .story-section,
+    .app.message-mode .story-section,
+    .app.bicarb-mode .story-section,
+    .app.calcium-mode .story-section {
+      display: none;
+    }
+    .story-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .story-head strong {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+    .story-head small {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .story-track {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .story-button {
+      flex: 0 0 auto;
+      width: 76px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      padding: 0;
+      display: grid;
+      gap: 5px;
+      text-align: center;
+    }
+    .story-thumb {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto;
+      padding: 3px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #b796cc, #243f7a);
+    }
+    .story-thumb img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      object-fit: cover;
+      display: block;
+      background: #eef2f7;
+    }
+    .story-button span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .story-empty {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 0;
+    }
+    .story-viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+      padding: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 14px);
+      background: rgba(9, 14, 28, .96);
+      color: #fff;
+    }
+    .story-progress {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .22);
+      overflow: hidden;
+    }
+    .story-progress span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: #fff;
+      border-radius: inherit;
+    }
+    .story-viewer-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .story-viewer-head img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, .8);
+    }
+    .story-viewer-title {
+      min-width: 0;
+      flex: 1;
+    }
+    .story-viewer-title strong,
+    .story-viewer-title small {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .story-viewer-title strong { font-size: 14px; }
+    .story-viewer-title small {
+      color: rgba(255, 255, 255, .72);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .story-close {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      color: #fff;
+      font-size: 24px;
+      font-weight: 500;
+    }
+    .story-image-wrap {
+      min-height: 0;
+      display: grid;
+      place-items: center;
+    }
+    .story-image-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      object-fit: contain;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, .32);
+    }
+    .story-viewer-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .story-viewer-foot p {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 900;
+    }
+    .story-pause {
+      min-width: 102px;
+      min-height: 42px;
+      border: 0;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 900;
+    }
     @media (max-width: 520px) {
       .android-install-prompt {
         grid-template-columns: 1fr auto;
@@ -1783,6 +1959,15 @@
         </span>
         <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.03.05.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
+      </section>
+      <section id="storySection" class="story-section" aria-label="Klinik story">
+        <div class="story-head">
+          <strong>Klinik story</strong>
+          <small id="storyCountLabel">0 paylaşım</small>
+        </div>
+        <div id="storyTrack" class="story-track">
+          <div class="story-empty">Henüz paylaşım yok.</div>
+        </div>
       </section>
       <div class="search">
         <input id="searchInput" type="search" placeholder="Hekim ara" autocomplete="off">
@@ -1956,6 +2141,19 @@
         <button id="excelImportButton" type="button">Excel yükle ve database oluştur</button>
         <div id="importStatus" class="import-status"></div>
       </div>
+      <div id="storyAdminTools" class="drawer-tool admin-only" aria-label="Klinik story paylaş">
+        <h3>Klinik story paylaş</h3>
+        <label>
+          Hasta adı
+          <input id="storyPatientName" type="text" placeholder="Örn. Pamuk">
+        </label>
+        <label>
+          Fotoğraf
+          <input id="storyImageFile" type="file" accept="image/*">
+        </label>
+        <button id="storyShareButton" type="button">Defekasyon görüldü paylaş</button>
+        <div id="storyAdminStatus" class="import-status"></div>
+      </div>
       <details id="calculationToolsAccordion" class="tools-accordion admin-only">
         <summary>Hesaplama araçları</summary>
         <div class="tools-accordion-body">
@@ -1983,6 +2181,24 @@
   </div>
 
   <div id="toastArea" class="toast-area" aria-live="polite" aria-atomic="true"></div>
+  <div id="storyViewer" class="story-viewer" hidden>
+    <div class="story-progress"><span id="storyProgressBar"></span></div>
+    <div class="story-viewer-head">
+      <img id="storyViewerAvatar" alt="">
+      <div class="story-viewer-title">
+        <strong id="storyViewerPatient"></strong>
+        <small id="storyViewerMeta"></small>
+      </div>
+      <button id="storyCloseButton" class="story-close" type="button" aria-label="Kapat">×</button>
+    </div>
+    <div class="story-image-wrap">
+      <img id="storyViewerImage" alt="">
+    </div>
+    <div class="story-viewer-foot">
+      <p id="storyViewerCaption">Defekasyon görüldü</p>
+      <button id="storyPauseButton" class="story-pause" type="button">Duraklat</button>
+    </div>
+  </div>
   <div id="notificationPermissionPrompt" class="notification-permission" hidden>
     <p><strong>Bildirimlere izin ver</strong><br>İcap ve görev değişikliklerinde sistem bildirimi almak için izin ver.</p>
     <div class="notification-permission-actions">
@@ -2016,11 +2232,13 @@
     const notificationTable = "shift_notifications";
     const messageTable = "shift_messages";
     const messageReactionTable = "shift_message_reactions";
+    const storyTable = "shift_stories";
     const pushTokenTable = "shift_push_tokens";
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
     const appVersion = "2026.08.03.05";
+    const storyDurationMs = 15000;
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
@@ -2343,6 +2561,7 @@
     let supabaseNotificationChannel = null;
     let supabaseMessageChannel = null;
     let supabaseMessageReactionChannel = null;
+    let supabaseStoryChannel = null;
     let supabasePollTimer = null;
     let lastRemoteFingerprint = "";
     let lastNotificationFingerprint = "";
@@ -2353,6 +2572,12 @@
     let activeMessagePeer = "";
     let activeMessageReturnScreen = "";
     let bicarbTimingMode = "duration";
+    let clinicStories = [];
+    let activeStoryIndex = -1;
+    let storyRemainingMs = storyDurationMs;
+    let storyLastTick = 0;
+    let storyPaused = false;
+    let storyTimer = null;
     let hasLoadedRemoteOverrides = false;
     let suppressAddonNotifications = false;
     const pendingOverrideKeys = new Set();
@@ -2373,6 +2598,9 @@
       searchBar: document.querySelector(".search"),
       today: document.getElementById("todayButton"),
       dayStrip: document.getElementById("dayStrip"),
+      storySection: document.getElementById("storySection"),
+      storyTrack: document.getElementById("storyTrack"),
+      storyCountLabel: document.getElementById("storyCountLabel"),
       tabGroups: Array.from(document.querySelectorAll(".shift-tabs")),
       tabs: Array.from(document.querySelectorAll(".shift-tab")),
       morningTabCount: document.getElementById("morningTabCount"),
@@ -2409,6 +2637,11 @@
       excelDatabaseTools: document.getElementById("excelDatabaseTools"),
       excelFile: document.getElementById("excelFile"),
       excelImportButton: document.getElementById("excelImportButton"),
+      storyAdminTools: document.getElementById("storyAdminTools"),
+      storyPatientName: document.getElementById("storyPatientName"),
+      storyImageFile: document.getElementById("storyImageFile"),
+      storyShareButton: document.getElementById("storyShareButton"),
+      storyAdminStatus: document.getElementById("storyAdminStatus"),
       calculationToolsAccordion: document.getElementById("calculationToolsAccordion"),
       bicarbToolButton: document.getElementById("bicarbToolButton"),
       calciumToolButton: document.getElementById("calciumToolButton"),
@@ -2453,7 +2686,16 @@
       androidInstallText: document.getElementById("androidInstallText"),
       androidInstallLink: document.getElementById("androidInstallLink"),
       androidInstallDismiss: document.getElementById("androidInstallDismiss"),
-      drawerAndroidInstallLink: document.getElementById("drawerAndroidInstallLink")
+      drawerAndroidInstallLink: document.getElementById("drawerAndroidInstallLink"),
+      storyViewer: document.getElementById("storyViewer"),
+      storyProgressBar: document.getElementById("storyProgressBar"),
+      storyViewerAvatar: document.getElementById("storyViewerAvatar"),
+      storyViewerPatient: document.getElementById("storyViewerPatient"),
+      storyViewerMeta: document.getElementById("storyViewerMeta"),
+      storyViewerImage: document.getElementById("storyViewerImage"),
+      storyViewerCaption: document.getElementById("storyViewerCaption"),
+      storyCloseButton: document.getElementById("storyCloseButton"),
+      storyPauseButton: document.getElementById("storyPauseButton")
     };
 
     function norm(text) {
@@ -2574,6 +2816,7 @@
 
     function updateAdminVisibility() {
       els.excelDatabaseTools.hidden = !isAdminUser();
+      els.storyAdminTools.hidden = !isAdminUser();
       els.calculationToolsAccordion.hidden = !isAdminUser();
       els.bicarbToolButton.hidden = !isAdminUser();
       els.calciumToolButton.hidden = !isAdminUser();
@@ -4892,6 +5135,215 @@
       }, { includeCurrentUser: true });
     }
 
+    function storyFromRecord(record) {
+      return {
+        id: String(record.id || ""),
+        patientName: record.patient_name || "Hasta",
+        caption: record.caption || "Defekasyon görüldü",
+        imageData: record.image_data || "",
+        author: record.author || "",
+        createdAt: record.created_at || new Date().toISOString()
+      };
+    }
+
+    function sortStories(items) {
+      return [...items]
+        .filter(item => item.id && item.imageData)
+        .sort((a, b) => safeTimeValue(b.createdAt) - safeTimeValue(a.createdAt))
+        .slice(0, 40);
+    }
+
+    function upsertClinicStory(item) {
+      const index = clinicStories.findIndex(story => story.id === item.id);
+      if (index >= 0) clinicStories[index] = { ...clinicStories[index], ...item };
+      else clinicStories.unshift(item);
+      clinicStories = sortStories(clinicStories);
+      renderStoryStrip();
+    }
+
+    function renderStoryStrip() {
+      if (!els.storyTrack) return;
+      const count = clinicStories.length;
+      els.storyCountLabel.textContent = `${count} paylaşım`;
+      if (!count) {
+        els.storyTrack.innerHTML = '<div class="story-empty">Henüz paylaşım yok.</div>';
+        return;
+      }
+      els.storyTrack.innerHTML = clinicStories.map((story, index) => `
+        <button class="story-button" type="button" data-story-index="${index}" aria-label="${escapeHtml(story.patientName)} story">
+          <span class="story-thumb"><img src="${escapeHtml(story.imageData)}" alt=""></span>
+          <span>${escapeHtml(story.patientName)}</span>
+        </button>
+      `).join("");
+      els.storyTrack.querySelectorAll("[data-story-index]").forEach(button => {
+        button.addEventListener("click", () => openStoryViewer(Number(button.dataset.storyIndex || 0)));
+      });
+    }
+
+    function renderStoryViewer() {
+      const story = clinicStories[activeStoryIndex];
+      if (!story) return;
+      els.storyViewerAvatar.src = story.imageData;
+      els.storyViewerImage.src = story.imageData;
+      els.storyViewerPatient.textContent = story.patientName;
+      els.storyViewerMeta.textContent = `${notificationTimeLabel(story.createdAt)} paylaşıldı`;
+      els.storyViewerCaption.textContent = story.caption || "Defekasyon görüldü";
+      els.storyPauseButton.textContent = storyPaused ? "Devam" : "Duraklat";
+      const progress = Math.max(0, Math.min(100, ((storyDurationMs - storyRemainingMs) / storyDurationMs) * 100));
+      els.storyProgressBar.style.width = `${progress}%`;
+    }
+
+    function stopStoryTimer() {
+      if (storyTimer) window.clearInterval(storyTimer);
+      storyTimer = null;
+    }
+
+    function startStoryTimer() {
+      stopStoryTimer();
+      storyLastTick = Date.now();
+      storyTimer = window.setInterval(() => {
+        const now = Date.now();
+        if (!storyPaused) {
+          storyRemainingMs -= now - storyLastTick;
+          if (storyRemainingMs <= 0) {
+            openStoryViewer(activeStoryIndex + 1);
+            return;
+          }
+        }
+        storyLastTick = now;
+        renderStoryViewer();
+      }, 100);
+    }
+
+    function openStoryViewer(index = 0) {
+      if (!clinicStories.length) return;
+      if (index >= clinicStories.length) {
+        closeStoryViewer();
+        return;
+      }
+      activeStoryIndex = Math.max(0, index);
+      storyRemainingMs = storyDurationMs;
+      storyPaused = false;
+      els.storyViewer.hidden = false;
+      renderStoryViewer();
+      startStoryTimer();
+    }
+
+    function closeStoryViewer() {
+      stopStoryTimer();
+      activeStoryIndex = -1;
+      els.storyViewer.hidden = true;
+      els.storyProgressBar.style.width = "0%";
+    }
+
+    function toggleStoryPause() {
+      storyPaused = !storyPaused;
+      storyLastTick = Date.now();
+      renderStoryViewer();
+    }
+
+    function imageFileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("Fotoğraf okunamadı."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImageElement(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("Fotoğraf işlenemedi."));
+        image.src = src;
+      });
+    }
+
+    async function resizeStoryImage(file) {
+      const dataUrl = await imageFileToDataUrl(file);
+      const image = await loadImageElement(dataUrl);
+      const maxSide = 1280;
+      const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.width * scale));
+      canvas.height = Math.max(1, Math.round(image.height * scale));
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL("image/jpeg", 0.82);
+    }
+
+    async function shareDefecationStory() {
+      if (!isAdminUser()) return;
+      const patientName = els.storyPatientName.value.trim();
+      const file = els.storyImageFile.files?.[0];
+      if (!patientName || !file) {
+        els.storyAdminStatus.textContent = "Hasta adı ve fotoğraf seçilmeli.";
+        return;
+      }
+      try {
+        els.storyShareButton.disabled = true;
+        els.storyAdminStatus.textContent = "Fotoğraf hazırlanıyor...";
+        const imageData = await resizeStoryImage(file);
+        const item = {
+          id: `story-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          patientName,
+          caption: "Defekasyon görüldü",
+          imageData,
+          author: currentUsername() || "",
+          createdAt: new Date().toISOString()
+        };
+        upsertClinicStory(item);
+        els.storyAdminStatus.textContent = "Supabase'e kaydediliyor...";
+        await supabaseRequest(`${storyTable}?on_conflict=id`, {
+          method: "POST",
+          headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+          body: JSON.stringify({
+            id: item.id,
+            patient_name: item.patientName,
+            caption: item.caption,
+            image_data: item.imageData,
+            author: item.author,
+            created_at: item.createdAt
+          })
+        });
+        els.storyPatientName.value = "";
+        els.storyImageFile.value = "";
+        els.storyAdminStatus.textContent = "Story paylaşıldı.";
+      } catch (error) {
+        els.storyAdminStatus.textContent = `Story paylaşılamadı: ${error.message}`;
+      } finally {
+        els.storyShareButton.disabled = false;
+      }
+    }
+
+    async function loadSupabaseStories({ silent = true } = {}) {
+      try {
+        const records = await supabaseRequest(`${storyTable}?select=id,patient_name,caption,image_data,author,created_at&order=created_at.desc&limit=40`);
+        if (!Array.isArray(records)) return;
+        const fingerprint = JSON.stringify(records.map(record => [record.id, record.patient_name, record.created_at]));
+        if (fingerprint === loadSupabaseStories.lastFingerprint && silent) return;
+        loadSupabaseStories.lastFingerprint = fingerprint;
+        clinicStories = sortStories(records.map(storyFromRecord));
+        renderStoryStrip();
+      } catch (error) {
+        if (!silent && els.storyAdminStatus) {
+          els.storyAdminStatus.textContent = `Story listesi alınamadı: ${error.message}`;
+        }
+      }
+    }
+
+    function handleSupabaseStory(payload) {
+      if (payload.eventType === "DELETE") {
+        const id = String(payload.old?.id || "");
+        clinicStories = clinicStories.filter(story => story.id !== id);
+        renderStoryStrip();
+        return;
+      }
+      if (!["INSERT", "UPDATE"].includes(payload.eventType) || !payload.new?.id) return;
+      upsertClinicStory(storyFromRecord(payload.new));
+    }
+
     function shiftValueLabel(raw) {
       const base = baseRaw(raw);
       if (!base) return "İzinli";
@@ -5191,6 +5643,14 @@
           table: messageReactionTable
         }, handleSupabaseMessageReaction)
         .subscribe();
+      supabaseStoryChannel = supabaseClient
+        .channel("shift-stories-realtime")
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: storyTable
+        }, handleSupabaseStory)
+        .subscribe();
     }
 
     function startSupabasePollingFallback() {
@@ -5200,6 +5660,7 @@
         await loadSupabaseNotifications({ silent: true });
         await loadSupabaseMessages({ silent: true });
         await loadSupabaseMessageReactions({ silent: true });
+        await loadSupabaseStories({ silent: true });
         supabasePollTimer = window.setTimeout(poll, document.hidden ? 5000 : 1500);
       };
       supabasePollTimer = window.setTimeout(poll, 1500);
@@ -6125,6 +6586,12 @@
     els.androidInstallDismiss.addEventListener("click", dismissAndroidInstallPrompt);
     els.pushTestButton.addEventListener("click", sendPushTestNotification);
     els.excelImportButton.addEventListener("click", importExcelFile);
+    els.storyShareButton.addEventListener("click", shareDefecationStory);
+    els.storyCloseButton.addEventListener("click", closeStoryViewer);
+    els.storyPauseButton.addEventListener("click", toggleStoryPause);
+    els.storyViewer.addEventListener("click", event => {
+      if (event.target === els.storyViewer) closeStoryViewer();
+    });
     els.bicarbToolButton.addEventListener("click", openBicarbonateTool);
     els.calciumToolButton.addEventListener("click", openCalciumTool);
     els.bicarbBackButton.addEventListener("click", () => goBackOrClose(goHome));
@@ -6195,6 +6662,7 @@
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") {
         closeDrawer();
+        closeStoryViewer();
         profileEditContext = null;
         closeCodeMenu();
       }
@@ -6212,6 +6680,7 @@
     renderAppVersion();
     renderNotificationBadge();
     renderMessageBadge();
+    renderStoryStrip();
     updateNotificationStatus();
     updateAndroidInstallPrompt();
     checkForAppUpdate();
@@ -6222,6 +6691,7 @@
     loadSupabaseNotifications({ silent: false });
     loadSupabaseMessages({ silent: false });
     loadSupabaseMessageReactions({ silent: true });
+    loadSupabaseStories({ silent: false });
     startSupabaseRealtime();
     startSupabasePollingFallback();
   </script>
