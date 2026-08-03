@@ -1967,6 +1967,70 @@
       color: #fff;
       font-weight: 900;
     }
+    .story-camera-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 92;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 12px;
+      padding: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 14px);
+      background: rgba(9, 14, 28, .96);
+      color: #fff;
+    }
+    .story-camera-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .story-camera-head strong {
+      font-size: 15px;
+      font-weight: 900;
+    }
+    .story-camera-close {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      color: #fff;
+      font-size: 24px;
+      font-weight: 900;
+    }
+    .story-camera-preview {
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #05070d;
+    }
+    .story-camera-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .story-camera-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .story-camera-actions button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 999px;
+      font-weight: 900;
+    }
+    .story-camera-capture {
+      background: #fff;
+      color: var(--ink);
+    }
+    .story-camera-gallery {
+      background: rgba(255, 255, 255, .14);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .28) !important;
+    }
     @media (max-width: 520px) {
       .android-install-prompt {
         grid-template-columns: 1fr auto;
@@ -2269,6 +2333,19 @@
         <button id="storyDownloadButton" class="story-download" type="button">İndir</button>
         <button id="storyPauseButton" class="story-pause" type="button">Duraklat</button>
       </div>
+    </div>
+  </div>
+  <div id="storyCameraModal" class="story-camera-modal" hidden>
+    <div class="story-camera-head">
+      <strong>Hikaye kamerası</strong>
+      <button id="storyCameraCloseButton" class="story-camera-close" type="button" aria-label="Kapat">×</button>
+    </div>
+    <div class="story-camera-preview">
+      <video id="storyCameraPreview" autoplay muted playsinline></video>
+    </div>
+    <div class="story-camera-actions">
+      <button id="storyCameraCaptureButton" class="story-camera-capture" type="button">Çek ve paylaş</button>
+      <button id="storyGalleryButton" class="story-camera-gallery" type="button">Galeriden seç</button>
     </div>
   </div>
   <div id="notificationPermissionPrompt" class="notification-permission" hidden>
@@ -2652,6 +2729,7 @@
     let storyPaused = false;
     let storyTimer = null;
     let storyUploadBusy = false;
+    let storyCameraStream = null;
     let hasLoadedRemoteOverrides = false;
     let suppressAddonNotifications = false;
     const pendingOverrideKeys = new Set();
@@ -2768,7 +2846,12 @@
       storyViewerCaption: document.getElementById("storyViewerCaption"),
       storyCloseButton: document.getElementById("storyCloseButton"),
       storyDownloadButton: document.getElementById("storyDownloadButton"),
-      storyPauseButton: document.getElementById("storyPauseButton")
+      storyPauseButton: document.getElementById("storyPauseButton"),
+      storyCameraModal: document.getElementById("storyCameraModal"),
+      storyCameraPreview: document.getElementById("storyCameraPreview"),
+      storyCameraCloseButton: document.getElementById("storyCameraCloseButton"),
+      storyCameraCaptureButton: document.getElementById("storyCameraCaptureButton"),
+      storyGalleryButton: document.getElementById("storyGalleryButton")
     };
 
     function norm(text) {
@@ -5304,7 +5387,7 @@
       }
       els.storyViewerPatient.textContent = story.patientName;
       const authorName = story.author ? displayNameForUser(story.author) : "Kullanıcı";
-      els.storyViewerMeta.textContent = `${notificationTimeLabel(story.createdAt)} ${authorName} tarafından paylaşıldı`;
+      els.storyViewerMeta.textContent = `${authorName} tarafından ${notificationTimeLabel(story.createdAt)} paylaşıldı`;
       els.storyViewerCaption.textContent = story.caption || "Defekasyon görüldü";
       els.storyPauseButton.textContent = storyPaused ? "Devam" : "Duraklat";
       const progress = Math.max(0, Math.min(100, ((storyDurationMs - storyRemainingMs) / storyDurationMs) * 100));
@@ -5461,26 +5544,101 @@
       if (els.storyAdminStatus) els.storyAdminStatus.textContent = message;
     }
 
-    function openStoryCamera() {
+    function closeStoryCameraModal() {
+      if (storyCameraStream) {
+        storyCameraStream.getTracks().forEach(track => track.stop());
+      }
+      storyCameraStream = null;
+      if (els.storyCameraPreview) els.storyCameraPreview.srcObject = null;
+      if (els.storyCameraModal) els.storyCameraModal.hidden = true;
+    }
+
+    function openStoryGalleryPicker() {
       if (!isAdminUser() || storyUploadBusy) return;
       setStoryAdminStatus("");
+      closeStoryCameraModal();
       els.storyImageFile.value = "";
       els.storyImageFile.click();
+    }
+
+    async function openStoryCamera() {
+      if (!isAdminUser() || storyUploadBusy) return;
+      setStoryAdminStatus("");
+      if (!navigator.mediaDevices?.getUserMedia) {
+        openStoryGalleryPicker();
+        return;
+      }
+      try {
+        storyCameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: false
+        });
+        els.storyCameraPreview.srcObject = storyCameraStream;
+        els.storyCameraModal.hidden = false;
+      } catch (error) {
+        setStoryAdminStatus("Kamera açılamadı. Galeriden seçim açıldı.");
+        openStoryGalleryPicker();
+      }
+    }
+
+    function captureStoryCameraFrame() {
+      return new Promise((resolve, reject) => {
+        const video = els.storyCameraPreview;
+        if (!video?.videoWidth || !video.videoHeight) {
+          reject(new Error("Kamera görüntüsü hazır değil."));
+          return;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext("2d");
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => {
+          if (!blob) {
+            reject(new Error("Fotoğraf oluşturulamadı."));
+            return;
+          }
+          resolve(new File([blob], `story-camera-${Date.now()}.jpg`, { type: "image/jpeg" }));
+        }, "image/jpeg", 0.86);
+      });
+    }
+
+    async function captureAndShareStoryCamera() {
+      if (!isAdminUser() || storyUploadBusy) return;
+      try {
+        const file = await captureStoryCameraFrame();
+        closeStoryCameraModal();
+        const details = askStoryShareDetails();
+        if (!details) return;
+        await shareDefecationStory(details.patientName, file, details.caption);
+      } catch (error) {
+        setStoryAdminStatus(`Fotoğraf çekilemedi: ${error.message}`);
+      }
     }
 
     async function handleStoryMediaSelected() {
       const file = els.storyImageFile.files?.[0];
       if (!file) return;
-      const patientName = window.prompt("Hasta adı", "")?.trim();
-      if (!patientName) {
+      const details = askStoryShareDetails();
+      if (!details) {
         els.storyImageFile.value = "";
-        setStoryAdminStatus("Story paylaşmak için hasta adı girilmeli.");
         return;
       }
-      await shareDefecationStory(patientName, file);
+      await shareDefecationStory(details.patientName, file, details.caption);
     }
 
-    async function shareDefecationStory(patientName, file) {
+    function askStoryShareDetails() {
+      const patientName = window.prompt("Hasta adı", "")?.trim();
+      if (!patientName) {
+        setStoryAdminStatus("Story paylaşmak için hasta adı girilmeli.");
+        return null;
+      }
+      const captionInput = window.prompt("Açıklama", "Defekasyon görüldü");
+      const caption = captionInput === null ? "Defekasyon görüldü" : (captionInput.trim() || "Defekasyon görüldü");
+      return { patientName, caption };
+    }
+
+    async function shareDefecationStory(patientName, file, caption = "Defekasyon görüldü") {
       if (!isAdminUser()) return;
       if (!patientName || !file) {
         setStoryAdminStatus("Hasta adı ve medya seçilmeli.");
@@ -5493,7 +5651,7 @@
         const item = {
           id: `story-${Date.now()}-${Math.random().toString(16).slice(2)}`,
           patientName,
-          caption: "Defekasyon görüldü",
+          caption,
           imageData,
           author: currentUsername() || "",
           createdAt: new Date().toISOString()
@@ -6794,6 +6952,9 @@
     els.storyCloseButton.addEventListener("click", closeStoryViewer);
     els.storyDownloadButton.addEventListener("click", downloadActiveStory);
     els.storyPauseButton.addEventListener("click", toggleStoryPause);
+    els.storyCameraCloseButton.addEventListener("click", closeStoryCameraModal);
+    els.storyCameraCaptureButton.addEventListener("click", captureAndShareStoryCamera);
+    els.storyGalleryButton.addEventListener("click", openStoryGalleryPicker);
     els.storyViewerVideo.addEventListener("ended", () => {
       if (!storyPaused) openStoryViewer(activeStoryIndex + 1);
     });
