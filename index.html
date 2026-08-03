@@ -763,6 +763,26 @@
       flex-wrap: wrap;
       gap: 8px;
     }
+    .profile-story-section {
+      margin: 4px 0 12px;
+      padding: 10px 0 12px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .profile-story-section strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+    .profile-story-track {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
+    }
     .message-send-button {
       min-height: 38px;
       border: 1px solid var(--line);
@@ -1905,6 +1925,7 @@
       font-weight: 500;
     }
     .story-image-wrap {
+      position: relative;
       min-height: 0;
       display: grid;
       place-items: center;
@@ -1918,6 +1939,19 @@
       box-shadow: 0 18px 40px rgba(0, 0, 0, .32);
       background: #05070d;
     }
+    .story-nav-zone {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      z-index: 3;
+      width: 50%;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: transparent;
+    }
+    .story-nav-zone.left { left: 0; }
+    .story-nav-zone.right { right: 0; }
     .story-camera-row {
       display: grid;
       gap: 6px;
@@ -2330,8 +2364,10 @@
       <button id="storyCloseButton" class="story-close" type="button" aria-label="Kapat">×</button>
     </div>
     <div class="story-image-wrap">
+      <button id="storyPrevZone" class="story-nav-zone left" type="button" aria-label="Önceki story"></button>
       <img id="storyViewerImage" alt="">
       <video id="storyViewerVideo" muted playsinline hidden></video>
+      <button id="storyNextZone" class="story-nav-zone right" type="button" aria-label="Sonraki story"></button>
     </div>
     <div class="story-viewer-foot">
       <p id="storyViewerCaption">Defekasyon görüldü</p>
@@ -2396,6 +2432,7 @@
     const appVersion = "2026.08.03.05";
     const storyDurationMs = 15000;
     const storyLifetimeMs = 24 * 60 * 60 * 1000;
+    const storyRetentionMs = 48 * 60 * 60 * 1000;
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
@@ -2850,6 +2887,8 @@
       storyViewerMeta: document.getElementById("storyViewerMeta"),
       storyViewerImage: document.getElementById("storyViewerImage"),
       storyViewerVideo: document.getElementById("storyViewerVideo"),
+      storyPrevZone: document.getElementById("storyPrevZone"),
+      storyNextZone: document.getElementById("storyNextZone"),
       storyViewerCaption: document.getElementById("storyViewerCaption"),
       storyCloseButton: document.getElementById("storyCloseButton"),
       storyDownloadButton: document.getElementById("storyDownloadButton"),
@@ -2964,6 +3003,14 @@
       return currentUsername() === appUsername;
     }
 
+    function canViewStorySection() {
+      return isAdminUser() || messageUser(currentUsername()) === "hasansar";
+    }
+
+    function canShareStories() {
+      return isAdminUser() || messageUser(currentUsername()) === "hasansar";
+    }
+
     function updateUserBadge() {
       const username = currentUsername() || "";
       els.userBadge.innerHTML = `
@@ -2978,7 +3025,7 @@
     }
 
     function updateAdminVisibility() {
-      els.storySection.hidden = !isAdminUser();
+      els.storySection.hidden = !canViewStorySection();
       els.excelDatabaseTools.hidden = !isAdminUser();
       els.calculationToolsAccordion.hidden = !isAdminUser();
       els.bicarbToolButton.hidden = !isAdminUser();
@@ -5392,6 +5439,30 @@
       `;
     }
 
+    function profileStoriesMarkup(row) {
+      const profileUser = userForDoctor(row);
+      if (!profileUser) return "";
+      const stories = sortStories(clinicStories)
+        .filter(story => messageUser(story.author) === profileUser);
+      if (!stories.length) return "";
+      return `
+        <section class="profile-story-section" aria-label="Paylaşılan storyler">
+          <strong>Paylaştığı storyler</strong>
+          <div class="profile-story-track">
+            ${stories.map(story => {
+              const viewedClass = hasViewedStory(story.id) ? "viewed" : "unviewed";
+              return `
+                <button class="story-button ${viewedClass}" type="button" data-profile-story-id="${escapeHtml(story.id)}" aria-label="${escapeHtml(story.patientName)} story">
+                  <span class="story-thumb">${storyThumbMarkup(story)}</span>
+                  <span>${escapeHtml(story.patientName)}</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        </section>
+      `;
+    }
+
     function renderStoryStrip() {
       if (!els.storyTrack) return;
       const count = clinicStories.length;
@@ -5405,7 +5476,8 @@
         </button>
       `;
       }).join("");
-      els.storyTrack.innerHTML = `${storyAddButtonMarkup()}${storyButtons || '<div class="story-empty">Henüz paylaşım yok.</div>'}`;
+      const addButton = canShareStories() ? storyAddButtonMarkup() : "";
+      els.storyTrack.innerHTML = `${addButton}${storyButtons || '<div class="story-empty">Henüz paylaşım yok.</div>'}`;
       els.storyTrack.querySelector("[data-story-add]")?.addEventListener("click", openStoryCamera);
       els.storyTrack.querySelectorAll("[data-story-index]").forEach(button => {
         button.addEventListener("click", () => openStoryViewer(Number(button.dataset.storyIndex || 0)));
@@ -5466,6 +5538,7 @@
 
     function openStoryViewer(index = 0) {
       if (!clinicStories.length) return;
+      if (index < 0) index = 0;
       if (index >= clinicStories.length) {
         closeStoryViewer();
         return;
@@ -5481,6 +5554,11 @@
       els.storyViewer.hidden = false;
       renderStoryViewer();
       startStoryTimer();
+    }
+
+    function changeStory(direction) {
+      if (activeStoryIndex < 0) return;
+      openStoryViewer(activeStoryIndex + direction);
     }
 
     function closeStoryViewer() {
@@ -5607,7 +5685,7 @@
     }
 
     function openStoryGalleryPicker() {
-      if (!isAdminUser() || storyUploadBusy) return;
+      if (!canShareStories() || storyUploadBusy) return;
       setStoryAdminStatus("");
       closeStoryCameraModal();
       els.storyImageFile.value = "";
@@ -5615,7 +5693,7 @@
     }
 
     async function openStoryCamera() {
-      if (!isAdminUser() || storyUploadBusy) return;
+      if (!canShareStories() || storyUploadBusy) return;
       setStoryAdminStatus("");
       if (!navigator.mediaDevices?.getUserMedia) {
         openStoryGalleryPicker();
@@ -5657,7 +5735,7 @@
     }
 
     async function captureAndShareStoryCamera() {
-      if (!isAdminUser() || storyUploadBusy) return;
+      if (!canShareStories() || storyUploadBusy) return;
       try {
         const file = await captureStoryCameraFrame();
         closeStoryCameraModal();
@@ -5692,7 +5770,7 @@
     }
 
     async function shareDefecationStory(patientName, file, caption = "Defekasyon görüldü") {
-      if (!isAdminUser()) return;
+      if (!canShareStories()) return;
       if (!patientName || !file) {
         setStoryAdminStatus("Hasta adı ve medya seçilmeli.");
         return;
@@ -5732,8 +5810,20 @@
       }
     }
 
+    async function cleanupExpiredSupabaseStories() {
+      const now = Date.now();
+      if (cleanupExpiredSupabaseStories.lastRun && now - cleanupExpiredSupabaseStories.lastRun < 30 * 60 * 1000) return;
+      cleanupExpiredSupabaseStories.lastRun = now;
+      const cutoffIso = new Date(now - storyRetentionMs).toISOString();
+      await supabaseRequest(`${storyTable}?created_at=lt.${encodeURIComponent(cutoffIso)}`, {
+        method: "DELETE",
+        headers: { Prefer: "return=minimal" }
+      });
+    }
+
     async function loadSupabaseStories({ silent = true } = {}) {
       try {
+        await cleanupExpiredSupabaseStories().catch(() => {});
         const records = await supabaseRequest(`${storyTable}?select=id,patient_name,caption,image_data,author,created_at&order=created_at.desc&limit=40`);
         if (!Array.isArray(records)) return;
         const fingerprint = JSON.stringify(records.map(record => [record.id, record.patient_name, record.created_at]));
@@ -6559,6 +6649,7 @@
           </div>
           <div class="profile-photo" aria-label="Profil fotoğrafı">${initials}</div>
         </div>
+        ${profileStoriesMarkup(row)}
         ${row.shiftless ? '<div class="empty">Bu profil şift listesinde yer almıyor.</div>' : `<div class="profile-days">
           ${entries.map(item => `
             <div class="profile-day${item.day.day === today ? " today" : ""}">
@@ -6575,6 +6666,12 @@
       els.app.classList.add("profile-mode");
       document.getElementById("profileBackButton").addEventListener("click", () => goBackOrClose(closeProfile));
       document.getElementById("profileMessageButton").addEventListener("click", () => openMessageCenter(row.sicil));
+      els.profileView.querySelectorAll("[data-profile-story-id]").forEach(button => {
+        button.addEventListener("click", () => {
+          const storyIndex = clinicStories.findIndex(story => story.id === button.dataset.profileStoryId);
+          if (storyIndex >= 0) openStoryViewer(storyIndex);
+        });
+      });
       els.profileView.querySelectorAll("[data-profile-code]").forEach(button => {
         button.addEventListener("click", () => {
           if (!isAdminUser()) return;
@@ -7005,6 +7102,8 @@
     els.storyCloseButton.addEventListener("click", closeStoryViewer);
     els.storyDownloadButton.addEventListener("click", downloadActiveStory);
     els.storyPauseButton.addEventListener("click", toggleStoryPause);
+    els.storyPrevZone.addEventListener("click", () => changeStory(-1));
+    els.storyNextZone.addEventListener("click", () => changeStory(1));
     els.storyCameraCloseButton.addEventListener("click", closeStoryCameraModal);
     els.storyCameraCaptureButton.addEventListener("click", captureAndShareStoryCamera);
     els.storyGalleryButton.addEventListener("click", openStoryGalleryPicker);
