@@ -4232,7 +4232,7 @@
     }
 
     function messageUser(value) {
-      return authUsername(value || "");
+      return authUsername(String(value || "").split("@")[0] || "");
     }
 
     function doctorNameForUser(username) {
