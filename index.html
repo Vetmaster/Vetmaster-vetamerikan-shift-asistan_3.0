@@ -2165,7 +2165,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.05.01.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.05.02.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <section id="storySection" class="story-section" aria-label="Klinik story">
@@ -2363,7 +2363,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.05.01.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.05.02.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -2455,7 +2455,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.05.01";
+    const appVersion = "2026.08.05.02";
     const storyDurationMs = 15000;
     const storyLifetimeMs = 24 * 60 * 60 * 1000;
     const storyRetentionMs = 48 * 60 * 60 * 1000;
@@ -7095,9 +7095,14 @@
       els.codeMenuOptions.classList.remove("range-mode");
     }
 
+    function bind(element, eventName, handler, options) {
+      if (!element) return;
+      element.addEventListener(eventName, handler, options);
+    }
+
     document.querySelectorAll(".shift-tabs").forEach(tabGroup => {
-      tabGroup.addEventListener("click", selectShiftFromEvent);
-      tabGroup.addEventListener("touchend", event => {
+      bind(tabGroup, "click", selectShiftFromEvent);
+      bind(tabGroup, "touchend", event => {
         event.preventDefault();
         selectShiftFromEvent(event);
       }, { passive: false });
@@ -7106,21 +7111,23 @@
     window.addEventListener("popstate", event => {
       applyAppHistoryState(event.state);
     });
-    els.search.addEventListener("input", () => {
+    bind(els.messageCenterButton, "click", () => openMessageCenter());
+    bind(els.menuButton, "click", openDrawer);
+    bind(els.search, "input", () => {
       state.query = els.search.value;
       state.shift = shiftForQuery(state.query);
       renderTabs();
       renderList();
     });
-    els.today.addEventListener("click", () => {
+    bind(els.today, "click", () => {
       if (!activeDataset) return;
       state.day = Math.min(dayForDataset(activeDataset), activeDays.length);
       syncShiftWithSearchQuery();
       render();
     });
-    els.prevDay.addEventListener("click", () => changeDay(-1));
-    els.nextDay.addEventListener("click", () => changeDay(1));
-    els.doctorList.addEventListener("click", event => {
+    bind(els.prevDay, "click", () => changeDay(-1));
+    bind(els.nextDay, "click", () => changeDay(1));
+    bind(els.doctorList, "click", event => {
       const nameButton = event.target.closest(".doctor-name");
       if (nameButton) {
         openProfile(nameButton.dataset.sicil);
@@ -7132,17 +7139,17 @@
       profileEditContext = null;
       openCodeMenu(button);
     });
-    els.codeMenuClose.addEventListener("click", () => {
+    bind(els.codeMenuClose, "click", () => {
       profileEditContext = null;
       closeCodeMenu();
     });
-    els.codeMenuBackdrop.addEventListener("click", () => {
+    bind(els.codeMenuBackdrop, "click", () => {
       profileEditContext = null;
       closeCodeMenu();
     });
-    els.notificationPromptAllow.addEventListener("click", requestNotifications);
-    els.notificationPromptDismiss.addEventListener("click", dismissNotificationPrompt);
-    els.androidInstallLink.addEventListener("click", event => {
+    bind(els.notificationPromptAllow, "click", requestNotifications);
+    bind(els.notificationPromptDismiss, "click", dismissNotificationPrompt);
+    bind(els.androidInstallLink, "click", event => {
       const updateUrl = els.androidInstallLink.dataset.updateUrl || "";
       if (pendingAppUpdate && updateUrl) {
         event.preventDefault();
@@ -7166,51 +7173,51 @@
       }
       dismissAndroidInstallPrompt();
     });
-    els.androidInstallDismiss.addEventListener("click", dismissAndroidInstallPrompt);
-    els.pushTestButton.addEventListener("click", sendPushTestNotification);
-    els.excelImportButton.addEventListener("click", importExcelFile);
-    els.storyImageFile.addEventListener("change", handleStoryMediaSelected);
-    els.storyCloseButton.addEventListener("click", closeStoryViewer);
-    els.storyDeleteButton.addEventListener("click", deleteActiveStory);
-    els.storyDownloadButton.addEventListener("click", downloadActiveStory);
-    els.storyPauseButton.addEventListener("click", toggleStoryPause);
-    els.storyPrevZone.addEventListener("click", () => changeStory(-1));
-    els.storyNextZone.addEventListener("click", () => changeStory(1));
-    els.storyCameraCloseButton.addEventListener("click", closeStoryCameraModal);
-    els.storyCameraCaptureButton.addEventListener("click", captureAndShareStoryCamera);
-    els.storyGalleryButton.addEventListener("click", openStoryGalleryPicker);
-    els.storyViewerVideo.addEventListener("ended", () => {
+    bind(els.androidInstallDismiss, "click", dismissAndroidInstallPrompt);
+    bind(els.pushTestButton, "click", sendPushTestNotification);
+    bind(els.excelImportButton, "click", importExcelFile);
+    bind(els.storyImageFile, "change", handleStoryMediaSelected);
+    bind(els.storyCloseButton, "click", closeStoryViewer);
+    bind(els.storyDeleteButton, "click", deleteActiveStory);
+    bind(els.storyDownloadButton, "click", downloadActiveStory);
+    bind(els.storyPauseButton, "click", toggleStoryPause);
+    bind(els.storyPrevZone, "click", () => changeStory(-1));
+    bind(els.storyNextZone, "click", () => changeStory(1));
+    bind(els.storyCameraCloseButton, "click", closeStoryCameraModal);
+    bind(els.storyCameraCaptureButton, "click", captureAndShareStoryCamera);
+    bind(els.storyGalleryButton, "click", openStoryGalleryPicker);
+    bind(els.storyViewerVideo, "ended", () => {
       if (!storyPaused) openStoryViewer(activeStoryIndex + 1);
     });
-    els.storyViewer.addEventListener("click", event => {
+    bind(els.storyViewer, "click", event => {
       if (event.target === els.storyViewer) closeStoryViewer();
     });
-    els.bicarbToolButton.addEventListener("click", openBicarbonateTool);
-    els.calciumToolButton.addEventListener("click", openCalciumTool);
-    els.bicarbBackButton.addEventListener("click", () => goBackOrClose(goHome));
-    els.calciumBackButton.addEventListener("click", () => goBackOrClose(goHome));
-    els.bicarbBe.addEventListener("input", normalizeBicarbonateBaseInput);
-    els.bicarbDuration.addEventListener("input", () => { bicarbTimingMode = "duration"; });
-    els.bicarbDuration.addEventListener("change", () => { bicarbTimingMode = "duration"; });
-    els.bicarbRate.addEventListener("input", () => { bicarbTimingMode = "rate"; });
-    els.bicarbRate.addEventListener("change", () => { bicarbTimingMode = "rate"; });
+    bind(els.bicarbToolButton, "click", openBicarbonateTool);
+    bind(els.calciumToolButton, "click", openCalciumTool);
+    bind(els.bicarbBackButton, "click", () => goBackOrClose(goHome));
+    bind(els.calciumBackButton, "click", () => goBackOrClose(goHome));
+    bind(els.bicarbBe, "input", normalizeBicarbonateBaseInput);
+    bind(els.bicarbDuration, "input", () => { bicarbTimingMode = "duration"; });
+    bind(els.bicarbDuration, "change", () => { bicarbTimingMode = "duration"; });
+    bind(els.bicarbRate, "input", () => { bicarbTimingMode = "rate"; });
+    bind(els.bicarbRate, "change", () => { bicarbTimingMode = "rate"; });
     [els.bicarbWeight, els.bicarbPh, els.bicarbBe, els.bicarbCurrent, els.bicarbTarget, els.bicarbFluidVolume, els.bicarbDuration, els.bicarbRate].forEach(input => {
-      input.addEventListener("input", calculateBicarbonate);
-      input.addEventListener("change", calculateBicarbonate);
+      bind(input, "input", calculateBicarbonate);
+      bind(input, "change", calculateBicarbonate);
     });
-    els.calciumWeight.addEventListener("input", calculateCalcium);
-    els.calciumWeight.addEventListener("change", calculateCalcium);
-    els.calciumPackageMode.addEventListener("change", () => {
+    bind(els.calciumWeight, "input", calculateCalcium);
+    bind(els.calciumWeight, "change", calculateCalcium);
+    bind(els.calciumPackageMode, "change", () => {
       const packageModeEnabled = els.calciumPackageMode.checked;
       els.calciumPackageLabel.hidden = !packageModeEnabled;
       els.calciumPackageVolume.disabled = !packageModeEnabled;
       calculateCalcium();
     });
     [els.calciumDose, els.calciumFluidVolume, els.calciumPackageVolume, els.calciumDuration].forEach(input => {
-      input.addEventListener("input", calculateCalcium);
-      input.addEventListener("change", calculateCalcium);
+      bind(input, "input", calculateCalcium);
+      bind(input, "change", calculateCalcium);
     });
-    els.authForm.addEventListener("submit", async event => {
+    bind(els.authForm, "submit", async event => {
       event.preventDefault();
       if (els.authScreen.classList.contains("register-mode")) {
         await registerUser();
@@ -7228,18 +7235,16 @@
       els.authPassword.value = "";
       els.authPassword.focus();
     });
-    els.showRegisterButton.addEventListener("click", showRegisterScreen);
-    els.showLoginButton.addEventListener("click", showLoginScreen);
-    els.createAccountButton.addEventListener("click", registerUser);
-    els.logoutButton.addEventListener("click", lockApp);
-    els.monthSelect.addEventListener("change", () => {
+    bind(els.showRegisterButton, "click", showRegisterScreen);
+    bind(els.showLoginButton, "click", showLoginScreen);
+    bind(els.createAccountButton, "click", registerUser);
+    bind(els.logoutButton, "click", lockApp);
+    bind(els.monthSelect, "change", () => {
       selectDataset(els.monthSelect.value);
     });
-    els.homeButton.addEventListener("click", goHome);
-    els.userBadge.addEventListener("click", openCurrentUserProfile);
-    els.notificationCenterButton.addEventListener("click", openNotificationCenter);
-    els.messageCenterButton.addEventListener("click", () => openMessageCenter());
-    els.menuButton.addEventListener("click", openDrawer);
+    bind(els.homeButton, "click", goHome);
+    bind(els.userBadge, "click", openCurrentUserProfile);
+    bind(els.notificationCenterButton, "click", openNotificationCenter);
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.addEventListener("message", event => {
         if (event.data?.type === "push-open") handleAndroidNotificationOpen(event.data.data || {});
@@ -7250,8 +7255,8 @@
       handleAndroidNotificationOpen(window.__pendingAndroidNotification);
       window.__pendingAndroidNotification = null;
     }
-    els.drawerClose.addEventListener("click", closeDrawer);
-    els.drawerBackdrop.addEventListener("click", closeDrawer);
+    bind(els.drawerClose, "click", closeDrawer);
+    bind(els.drawerBackdrop, "click", closeDrawer);
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") {
         closeDrawer();
