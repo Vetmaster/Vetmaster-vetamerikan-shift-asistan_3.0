@@ -1284,30 +1284,35 @@
     }
     .drawer {
       position: fixed;
-      inset: 0 0 0 auto;
+      inset: 0;
       z-index: 120;
-      width: min(360px, 92vw);
+      width: 100vw;
       height: 100vh;
       height: 100dvh;
       max-height: 100dvh;
       overflow: hidden;
       background: #fff;
-      border-left: 1px solid var(--line);
-      box-shadow: -18px 0 36px rgba(20, 33, 61, .18);
-      transform: translate3d(102%, 0, 0);
-      transition: transform .2s ease;
+      border-left: 0;
+      box-shadow: none;
       display: grid;
       grid-template-rows: auto 1fr;
       isolation: isolate;
+      visibility: hidden;
+      pointer-events: none;
     }
     .drawer.open {
-      transform: translate3d(0, 0, 0);
+      visibility: visible;
+      pointer-events: auto;
     }
-    @media (max-width: 640px) {
+    .drawer[hidden] {
+      display: none !important;
+    }
+    @media (min-width: 641px) {
       .drawer {
-        width: 100vw;
-        border-left: 0;
-        box-shadow: none;
+        inset: 0 0 0 auto;
+        width: min(360px, 92vw);
+        border-left: 1px solid var(--line);
+        box-shadow: -18px 0 36px rgba(20, 33, 61, .18);
       }
     }
     .code-menu-backdrop {
@@ -2178,7 +2183,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.05.05.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.05.06.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <section id="storySection" class="story-section" aria-label="Klinik story">
@@ -2353,7 +2358,7 @@
   </main>
 
   <div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
-  <aside id="drawer" class="drawer" aria-label="Menü" aria-hidden="true">
+  <aside id="drawer" class="drawer" aria-label="Menü" aria-hidden="true" hidden>
     <div class="drawer-head">
       <h2><span class="drawer-user-icon" aria-hidden="true">👤</span><span id="drawerUserTitle">Kullanıcı</span></h2>
       <button id="drawerClose" class="drawer-close" type="button" aria-label="Kapat">×</button>
@@ -2376,7 +2381,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.05.05.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.05.06.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -2468,7 +2473,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.05.05";
+    const appVersion = "2026.08.05.06";
     const storyDurationMs = 15000;
     const storyLifetimeMs = 24 * 60 * 60 * 1000;
     const storyRetentionMs = 48 * 60 * 60 * 1000;
@@ -6959,6 +6964,7 @@
     }
 
     function openDrawer() {
+      els.drawer.hidden = false;
       els.drawer.classList.add("open");
       els.drawer.setAttribute("aria-hidden", "false");
       els.drawerBackdrop.hidden = false;
@@ -6967,6 +6973,7 @@
     function closeDrawer() {
       els.drawer.classList.remove("open");
       els.drawer.setAttribute("aria-hidden", "true");
+      els.drawer.hidden = true;
       els.drawerBackdrop.hidden = true;
     }
 
