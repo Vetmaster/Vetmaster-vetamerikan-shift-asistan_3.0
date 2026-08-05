@@ -2148,7 +2148,7 @@
             </svg>
             <span id="notificationCount" class="notification-count" hidden>0</span>
           </button>
-          <button id="messageCenterButton" class="notification-icon-button message-icon" type="button" aria-label="Mesajlar">
+          <button id="messageCenterButton" class="notification-icon-button message-icon" type="button" aria-label="Mesajlar" onclick="event.stopImmediatePropagation();if(window.openMessageCenter){window.openMessageCenter()}">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5.2 5h13.6c1.2 0 2.2 1 2.2 2.2v7.7c0 1.2-1 2.2-2.2 2.2h-7.2L6.7 20v-2.9H5.2c-1.2 0-2.2-1-2.2-2.2V7.2C3 6 4 5 5.2 5Z"></path>
               <path d="M7.2 10h9.6"></path>
@@ -2156,7 +2156,7 @@
             </svg>
             <span id="messageCount" class="notification-count" hidden>0</span>
           </button>
-          <button id="menuButton" class="menu-button" type="button" aria-label="Menü">☰</button>
+          <button id="menuButton" class="menu-button" type="button" aria-label="Menü" onclick="event.stopImmediatePropagation();if(window.openDrawer){window.openDrawer()}else{var d=document.getElementById('drawer');var b=document.getElementById('drawerBackdrop');if(d){d.classList.add('open');d.setAttribute('aria-hidden','false')}if(b){b.hidden=false}}">☰</button>
         </div>
       </div>
     </header>
@@ -2165,7 +2165,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.05.02.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.05.03.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <section id="storySection" class="story-section" aria-label="Klinik story">
@@ -2363,7 +2363,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.05.02.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.05.03.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -2455,7 +2455,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.05.02";
+    const appVersion = "2026.08.05.03";
     const storyDurationMs = 15000;
     const storyLifetimeMs = 24 * 60 * 60 * 1000;
     const storyRetentionMs = 48 * 60 * 60 * 1000;
@@ -6956,6 +6956,8 @@
       els.drawer.setAttribute("aria-hidden", "true");
       els.drawerBackdrop.hidden = true;
     }
+    window.openDrawer = openDrawer;
+    window.openMessageCenter = openMessageCenter;
 
     function changeDay(delta) {
       if (!activeDataset) return;
