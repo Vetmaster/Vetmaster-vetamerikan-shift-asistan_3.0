@@ -1871,6 +1871,9 @@
       background: rgba(9, 14, 28, .96);
       color: #fff;
     }
+    .story-viewer[hidden] {
+      display: none !important;
+    }
     .story-progress {
       position: relative;
       z-index: 5;
@@ -1952,10 +1955,14 @@
       bottom: 0;
       z-index: 2;
       width: 50%;
+      display: none;
       border: 0;
       padding: 0;
       background: transparent;
       color: transparent;
+    }
+    .story-viewer:not([hidden]) .story-nav-zone {
+      display: block;
     }
     .story-nav-zone.left { left: 0; }
     .story-nav-zone.right { right: 0; }
