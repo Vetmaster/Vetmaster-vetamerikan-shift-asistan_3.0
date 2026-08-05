@@ -2161,7 +2161,7 @@
             </svg>
             <span id="notificationCount" class="notification-count" hidden>0</span>
           </button>
-          <button id="messageCenterButton" class="notification-icon-button message-icon" type="button" aria-label="Mesajlar" onclick="event.stopImmediatePropagation();if(window.openMessageCenter){window.openMessageCenter()}">
+          <button id="messageCenterButton" class="notification-icon-button message-icon" type="button" aria-label="Mesajlar">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5.2 5h13.6c1.2 0 2.2 1 2.2 2.2v7.7c0 1.2-1 2.2-2.2 2.2h-7.2L6.7 20v-2.9H5.2c-1.2 0-2.2-1-2.2-2.2V7.2C3 6 4 5 5.2 5Z"></path>
               <path d="M7.2 10h9.6"></path>
@@ -2169,7 +2169,7 @@
             </svg>
             <span id="messageCount" class="notification-count" hidden>0</span>
           </button>
-          <button id="menuButton" class="menu-button" type="button" aria-label="Menü" onclick="event.stopImmediatePropagation();if(window.openDrawer){window.openDrawer()}else{var d=document.getElementById('drawer');var b=document.getElementById('drawerBackdrop');if(d){d.classList.add('open');d.setAttribute('aria-hidden','false')}if(b){b.hidden=false}}">☰</button>
+          <button id="menuButton" class="menu-button" type="button" aria-label="Menü">☰</button>
         </div>
       </div>
     </header>
@@ -2178,7 +2178,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.05.04.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.05.05.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <section id="storySection" class="story-section" aria-label="Klinik story">
@@ -2376,7 +2376,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.05.04.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.05.05.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -2468,7 +2468,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.05.04";
+    const appVersion = "2026.08.05.05";
     const storyDurationMs = 15000;
     const storyLifetimeMs = 24 * 60 * 60 * 1000;
     const storyRetentionMs = 48 * 60 * 60 * 1000;
@@ -6969,8 +6969,6 @@
       els.drawer.setAttribute("aria-hidden", "true");
       els.drawerBackdrop.hidden = true;
     }
-    window.openDrawer = openDrawer;
-    window.openMessageCenter = openMessageCenter;
 
     function changeDay(delta) {
       if (!activeDataset) return;
@@ -7110,14 +7108,9 @@
       els.codeMenuOptions.classList.remove("range-mode");
     }
 
-    function bind(element, eventName, handler, options) {
-      if (!element) return;
-      element.addEventListener(eventName, handler, options);
-    }
-
     document.querySelectorAll(".shift-tabs").forEach(tabGroup => {
-      bind(tabGroup, "click", selectShiftFromEvent);
-      bind(tabGroup, "touchend", event => {
+      tabGroup.addEventListener("click", selectShiftFromEvent);
+      tabGroup.addEventListener("touchend", event => {
         event.preventDefault();
         selectShiftFromEvent(event);
       }, { passive: false });
@@ -7126,23 +7119,21 @@
     window.addEventListener("popstate", event => {
       applyAppHistoryState(event.state);
     });
-    bind(els.messageCenterButton, "click", () => openMessageCenter());
-    bind(els.menuButton, "click", openDrawer);
-    bind(els.search, "input", () => {
+    els.search.addEventListener("input", () => {
       state.query = els.search.value;
       state.shift = shiftForQuery(state.query);
       renderTabs();
       renderList();
     });
-    bind(els.today, "click", () => {
+    els.today.addEventListener("click", () => {
       if (!activeDataset) return;
       state.day = Math.min(dayForDataset(activeDataset), activeDays.length);
       syncShiftWithSearchQuery();
       render();
     });
-    bind(els.prevDay, "click", () => changeDay(-1));
-    bind(els.nextDay, "click", () => changeDay(1));
-    bind(els.doctorList, "click", event => {
+    els.prevDay.addEventListener("click", () => changeDay(-1));
+    els.nextDay.addEventListener("click", () => changeDay(1));
+    els.doctorList.addEventListener("click", event => {
       const nameButton = event.target.closest(".doctor-name");
       if (nameButton) {
         openProfile(nameButton.dataset.sicil);
@@ -7154,17 +7145,17 @@
       profileEditContext = null;
       openCodeMenu(button);
     });
-    bind(els.codeMenuClose, "click", () => {
+    els.codeMenuClose.addEventListener("click", () => {
       profileEditContext = null;
       closeCodeMenu();
     });
-    bind(els.codeMenuBackdrop, "click", () => {
+    els.codeMenuBackdrop.addEventListener("click", () => {
       profileEditContext = null;
       closeCodeMenu();
     });
-    bind(els.notificationPromptAllow, "click", requestNotifications);
-    bind(els.notificationPromptDismiss, "click", dismissNotificationPrompt);
-    bind(els.androidInstallLink, "click", event => {
+    els.notificationPromptAllow.addEventListener("click", requestNotifications);
+    els.notificationPromptDismiss.addEventListener("click", dismissNotificationPrompt);
+    els.androidInstallLink.addEventListener("click", event => {
       const updateUrl = els.androidInstallLink.dataset.updateUrl || "";
       if (pendingAppUpdate && updateUrl) {
         event.preventDefault();
@@ -7188,51 +7179,51 @@
       }
       dismissAndroidInstallPrompt();
     });
-    bind(els.androidInstallDismiss, "click", dismissAndroidInstallPrompt);
-    bind(els.pushTestButton, "click", sendPushTestNotification);
-    bind(els.excelImportButton, "click", importExcelFile);
-    bind(els.storyImageFile, "change", handleStoryMediaSelected);
-    bind(els.storyCloseButton, "click", closeStoryViewer);
-    bind(els.storyDeleteButton, "click", deleteActiveStory);
-    bind(els.storyDownloadButton, "click", downloadActiveStory);
-    bind(els.storyPauseButton, "click", toggleStoryPause);
-    bind(els.storyPrevZone, "click", () => changeStory(-1));
-    bind(els.storyNextZone, "click", () => changeStory(1));
-    bind(els.storyCameraCloseButton, "click", closeStoryCameraModal);
-    bind(els.storyCameraCaptureButton, "click", captureAndShareStoryCamera);
-    bind(els.storyGalleryButton, "click", openStoryGalleryPicker);
-    bind(els.storyViewerVideo, "ended", () => {
+    els.androidInstallDismiss.addEventListener("click", dismissAndroidInstallPrompt);
+    els.pushTestButton.addEventListener("click", sendPushTestNotification);
+    els.excelImportButton.addEventListener("click", importExcelFile);
+    els.storyImageFile.addEventListener("change", handleStoryMediaSelected);
+    els.storyCloseButton.addEventListener("click", closeStoryViewer);
+    els.storyDeleteButton.addEventListener("click", deleteActiveStory);
+    els.storyDownloadButton.addEventListener("click", downloadActiveStory);
+    els.storyPauseButton.addEventListener("click", toggleStoryPause);
+    els.storyPrevZone.addEventListener("click", () => changeStory(-1));
+    els.storyNextZone.addEventListener("click", () => changeStory(1));
+    els.storyCameraCloseButton.addEventListener("click", closeStoryCameraModal);
+    els.storyCameraCaptureButton.addEventListener("click", captureAndShareStoryCamera);
+    els.storyGalleryButton.addEventListener("click", openStoryGalleryPicker);
+    els.storyViewerVideo.addEventListener("ended", () => {
       if (!storyPaused) openStoryViewer(activeStoryIndex + 1);
     });
-    bind(els.storyViewer, "click", event => {
+    els.storyViewer.addEventListener("click", event => {
       if (event.target === els.storyViewer) closeStoryViewer();
     });
-    bind(els.bicarbToolButton, "click", openBicarbonateTool);
-    bind(els.calciumToolButton, "click", openCalciumTool);
-    bind(els.bicarbBackButton, "click", () => goBackOrClose(goHome));
-    bind(els.calciumBackButton, "click", () => goBackOrClose(goHome));
-    bind(els.bicarbBe, "input", normalizeBicarbonateBaseInput);
-    bind(els.bicarbDuration, "input", () => { bicarbTimingMode = "duration"; });
-    bind(els.bicarbDuration, "change", () => { bicarbTimingMode = "duration"; });
-    bind(els.bicarbRate, "input", () => { bicarbTimingMode = "rate"; });
-    bind(els.bicarbRate, "change", () => { bicarbTimingMode = "rate"; });
+    els.bicarbToolButton.addEventListener("click", openBicarbonateTool);
+    els.calciumToolButton.addEventListener("click", openCalciumTool);
+    els.bicarbBackButton.addEventListener("click", () => goBackOrClose(goHome));
+    els.calciumBackButton.addEventListener("click", () => goBackOrClose(goHome));
+    els.bicarbBe.addEventListener("input", normalizeBicarbonateBaseInput);
+    els.bicarbDuration.addEventListener("input", () => { bicarbTimingMode = "duration"; });
+    els.bicarbDuration.addEventListener("change", () => { bicarbTimingMode = "duration"; });
+    els.bicarbRate.addEventListener("input", () => { bicarbTimingMode = "rate"; });
+    els.bicarbRate.addEventListener("change", () => { bicarbTimingMode = "rate"; });
     [els.bicarbWeight, els.bicarbPh, els.bicarbBe, els.bicarbCurrent, els.bicarbTarget, els.bicarbFluidVolume, els.bicarbDuration, els.bicarbRate].forEach(input => {
-      bind(input, "input", calculateBicarbonate);
-      bind(input, "change", calculateBicarbonate);
+      input.addEventListener("input", calculateBicarbonate);
+      input.addEventListener("change", calculateBicarbonate);
     });
-    bind(els.calciumWeight, "input", calculateCalcium);
-    bind(els.calciumWeight, "change", calculateCalcium);
-    bind(els.calciumPackageMode, "change", () => {
+    els.calciumWeight.addEventListener("input", calculateCalcium);
+    els.calciumWeight.addEventListener("change", calculateCalcium);
+    els.calciumPackageMode.addEventListener("change", () => {
       const packageModeEnabled = els.calciumPackageMode.checked;
       els.calciumPackageLabel.hidden = !packageModeEnabled;
       els.calciumPackageVolume.disabled = !packageModeEnabled;
       calculateCalcium();
     });
     [els.calciumDose, els.calciumFluidVolume, els.calciumPackageVolume, els.calciumDuration].forEach(input => {
-      bind(input, "input", calculateCalcium);
-      bind(input, "change", calculateCalcium);
+      input.addEventListener("input", calculateCalcium);
+      input.addEventListener("change", calculateCalcium);
     });
-    bind(els.authForm, "submit", async event => {
+    els.authForm.addEventListener("submit", async event => {
       event.preventDefault();
       if (els.authScreen.classList.contains("register-mode")) {
         await registerUser();
@@ -7250,16 +7241,18 @@
       els.authPassword.value = "";
       els.authPassword.focus();
     });
-    bind(els.showRegisterButton, "click", showRegisterScreen);
-    bind(els.showLoginButton, "click", showLoginScreen);
-    bind(els.createAccountButton, "click", registerUser);
-    bind(els.logoutButton, "click", lockApp);
-    bind(els.monthSelect, "change", () => {
+    els.showRegisterButton.addEventListener("click", showRegisterScreen);
+    els.showLoginButton.addEventListener("click", showLoginScreen);
+    els.createAccountButton.addEventListener("click", registerUser);
+    els.logoutButton.addEventListener("click", lockApp);
+    els.monthSelect.addEventListener("change", () => {
       selectDataset(els.monthSelect.value);
     });
-    bind(els.homeButton, "click", goHome);
-    bind(els.userBadge, "click", openCurrentUserProfile);
-    bind(els.notificationCenterButton, "click", openNotificationCenter);
+    els.homeButton.addEventListener("click", goHome);
+    els.userBadge.addEventListener("click", openCurrentUserProfile);
+    els.notificationCenterButton.addEventListener("click", openNotificationCenter);
+    els.messageCenterButton.addEventListener("click", () => openMessageCenter());
+    els.menuButton.addEventListener("click", openDrawer);
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.addEventListener("message", event => {
         if (event.data?.type === "push-open") handleAndroidNotificationOpen(event.data.data || {});
@@ -7270,8 +7263,8 @@
       handleAndroidNotificationOpen(window.__pendingAndroidNotification);
       window.__pendingAndroidNotification = null;
     }
-    bind(els.drawerClose, "click", closeDrawer);
-    bind(els.drawerBackdrop, "click", closeDrawer);
+    els.drawerClose.addEventListener("click", closeDrawer);
+    els.drawerBackdrop.addEventListener("click", closeDrawer);
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") {
         closeDrawer();
