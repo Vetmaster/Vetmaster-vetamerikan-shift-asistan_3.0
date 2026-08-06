@@ -1266,9 +1266,11 @@
       position: fixed;
       top: 0;
       right: 0;
+      bottom: 0;
       z-index: 50;
-      width: min(360px, 92vw);
-      height: 100svh;
+      width: min(420px, 100vw);
+      height: 100vh;
+      height: 100dvh;
       background: var(--panel);
       border-left: 1px solid var(--line);
       box-shadow: -18px 0 36px rgba(20, 33, 61, .18);
@@ -1279,6 +1281,21 @@
     }
     .drawer.open {
       transform: translateX(0);
+    }
+    body.drawer-open {
+      overflow: hidden;
+    }
+    @media (max-width: 760px) {
+      .drawer {
+        left: 0;
+        width: 100vw;
+        max-width: none;
+        border-left: 0;
+        transform: translateX(100%);
+      }
+      .drawer.open {
+        transform: translateX(0);
+      }
     }
     .code-menu-backdrop {
       position: fixed;
@@ -5905,12 +5922,14 @@
       els.drawer.classList.add("open");
       els.drawer.setAttribute("aria-hidden", "false");
       els.drawerBackdrop.hidden = false;
+      document.body.classList.add("drawer-open");
     }
 
     function closeDrawer() {
       els.drawer.classList.remove("open");
       els.drawer.setAttribute("aria-hidden", "true");
       els.drawerBackdrop.hidden = true;
+      document.body.classList.remove("drawer-open");
     }
 
     function changeDay(delta) {
