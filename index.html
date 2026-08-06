@@ -763,26 +763,6 @@
       flex-wrap: wrap;
       gap: 8px;
     }
-    .profile-story-section {
-      margin: 4px 0 12px;
-      padding: 10px 0 12px;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-    .profile-story-section strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 13px;
-      font-weight: 900;
-      color: var(--ink);
-    }
-    .profile-story-track {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-      -webkit-overflow-scrolling: touch;
-    }
     .message-send-button {
       min-height: 38px;
       border: 1px solid var(--line);
@@ -1279,42 +1259,26 @@
     .drawer-backdrop {
       position: fixed;
       inset: 0;
-      z-index: 110;
+      z-index: 40;
       background: rgba(20, 33, 61, .34);
     }
     .drawer {
       position: fixed;
-      inset: 0;
-      z-index: 120;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      max-height: 100dvh;
-      overflow: hidden;
-      background: #fff !important;
-      border-left: 0;
-      box-shadow: none;
+      top: 0;
+      right: 0;
+      z-index: 50;
+      width: min(360px, 92vw);
+      height: 100svh;
+      background: var(--panel);
+      border-left: 1px solid var(--line);
+      box-shadow: -18px 0 36px rgba(20, 33, 61, .18);
+      transform: translateX(102%);
+      transition: transform .2s ease;
       display: grid;
       grid-template-rows: auto 1fr;
-      isolation: isolate;
-      visibility: hidden;
-      pointer-events: none;
     }
     .drawer.open {
-      visibility: visible;
-      pointer-events: auto;
-      opacity: 1;
-    }
-    .drawer[hidden] {
-      display: none !important;
-    }
-    @media (min-width: 641px) {
-      .drawer {
-        inset: 0 0 0 auto;
-        width: min(360px, 92vw);
-        border-left: 1px solid var(--line);
-        box-shadow: -18px 0 36px rgba(20, 33, 61, .18);
-      }
+      transform: translateX(0);
     }
     .code-menu-backdrop {
       position: fixed;
@@ -1420,15 +1384,12 @@
     }
     .drawer-head {
       min-height: 58px;
-      padding: calc(env(safe-area-inset-top) + 8px) 12px 8px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
       border-bottom: 1px solid var(--line);
-      background: #fff;
-      position: relative;
-      z-index: 1;
     }
     .drawer-head h2 {
       margin: 0;
@@ -1461,14 +1422,12 @@
       line-height: 1;
     }
     .import-body {
-      padding: 14px 14px calc(env(safe-area-inset-bottom) + 14px);
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 8px;
       min-height: 0;
       overflow: auto;
-      background: #fff;
-      -webkit-overflow-scrolling: touch;
     }
     .import-body input,
     .import-body select,
@@ -1753,370 +1712,6 @@
       background: #fff;
       color: var(--brand);
     }
-    .story-section {
-      margin: 0 0 12px;
-      padding: 10px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-    }
-    .app.profile-mode .story-section,
-    .app.notification-mode .story-section,
-    .app.message-mode .story-section,
-    .app.bicarb-mode .story-section,
-    .app.calcium-mode .story-section {
-      display: none;
-    }
-    .story-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-    .story-head strong {
-      font-size: 13px;
-      font-weight: 900;
-      color: var(--ink);
-    }
-    .story-head small {
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
-    }
-    .story-track {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .story-button {
-      flex: 0 0 auto;
-      width: 76px;
-      border: 0;
-      background: transparent;
-      color: var(--ink);
-      padding: 0;
-      display: grid;
-      gap: 5px;
-      text-align: center;
-    }
-    .story-add-button {
-      position: relative;
-    }
-    .story-thumb {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto;
-      padding: 3px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #ffcc32, #e0263f);
-    }
-    .story-button.viewed .story-thumb {
-      background: linear-gradient(135deg, #d1d5db, #6b7280);
-    }
-    .story-button.unviewed .story-thumb {
-      background: linear-gradient(135deg, #ffcf33, #ff7a1a 46%, #e11d48);
-    }
-    .story-add-button .story-thumb {
-      position: relative;
-      background: #101522;
-    }
-    .story-thumb-initials {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, #243f7a, #b796cc);
-      color: #fff;
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: 0;
-    }
-    .story-thumb img,
-    .story-thumb video {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      object-fit: cover;
-      display: block;
-      background: #eef2f7;
-    }
-    .story-thumb video {
-      pointer-events: none;
-    }
-    .story-plus-badge {
-      position: absolute;
-      right: 2px;
-      bottom: 16px;
-      width: 27px;
-      height: 27px;
-      border: 3px solid var(--panel);
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: #fff;
-      color: #05070d;
-      font-size: 24px;
-      line-height: 1;
-      font-weight: 900;
-      box-shadow: 0 8px 16px rgba(15, 23, 42, .2);
-    }
-    .story-button span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 11px;
-      font-weight: 900;
-    }
-    .story-empty {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      padding: 4px 0;
-      align-self: center;
-    }
-    .story-viewer {
-      position: fixed;
-      inset: 0;
-      z-index: 90;
-      display: grid;
-      grid-template-rows: auto auto 1fr auto;
-      gap: 8px;
-      padding: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 14px);
-      background: rgba(9, 14, 28, .96);
-      color: #fff;
-    }
-    .story-viewer[hidden] {
-      display: none !important;
-    }
-    .story-progress {
-      position: relative;
-      z-index: 5;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .22);
-      overflow: hidden;
-    }
-    .story-progress span {
-      display: block;
-      height: 100%;
-      width: 0%;
-      background: #fff;
-      border-radius: inherit;
-    }
-    .story-viewer-head {
-      position: relative;
-      z-index: 5;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-    .story-viewer-head img {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, .8);
-      background: #e7f5f6;
-    }
-    .story-viewer-title {
-      min-width: 0;
-      flex: 1;
-    }
-    .story-viewer-title strong,
-    .story-viewer-title small {
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .story-viewer-title strong { font-size: 14px; }
-    .story-viewer-title small {
-      color: rgba(255, 255, 255, .72);
-      font-size: 12px;
-      font-weight: 800;
-    }
-    .story-close {
-      width: 38px;
-      height: 38px;
-      border: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .12);
-      color: #fff;
-      font-size: 24px;
-      font-weight: 500;
-    }
-    .story-image-wrap {
-      position: relative;
-      min-height: 0;
-      display: grid;
-      place-items: center;
-    }
-    .story-image-wrap img,
-    .story-image-wrap video {
-      position: relative;
-      z-index: 1;
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 8px;
-      object-fit: contain;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, .32);
-      background: #05070d;
-    }
-    .story-nav-zone {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      z-index: 2;
-      width: 50%;
-      display: none;
-      border: 0;
-      padding: 0;
-      background: transparent;
-      color: transparent;
-    }
-    .story-viewer:not([hidden]) .story-nav-zone {
-      display: block;
-    }
-    .story-nav-zone.left { left: 0; }
-    .story-nav-zone.right { right: 0; }
-    .story-camera-row {
-      display: grid;
-      gap: 6px;
-    }
-    .story-camera-input {
-      position: fixed;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .story-camera-note,
-    .story-selected-media {
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
-      line-height: 1.35;
-    }
-    .story-selected-media {
-      min-height: 15px;
-    }
-    .story-viewer-foot {
-      position: relative;
-      z-index: 5;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .story-viewer-foot p {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 900;
-    }
-    .story-viewer-actions {
-      display: flex;
-      gap: 8px;
-      flex: 0 0 auto;
-    }
-    .story-pause {
-      min-width: 102px;
-      min-height: 42px;
-      border: 0;
-      border-radius: 999px;
-      background: #fff;
-      color: var(--ink);
-      font-weight: 900;
-    }
-    .story-download {
-      min-width: 76px;
-      min-height: 42px;
-      border: 1px solid rgba(255, 255, 255, .28);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .14);
-      color: #fff;
-      font-weight: 900;
-    }
-    .story-delete {
-      min-width: 66px;
-      min-height: 42px;
-      border: 1px solid rgba(255, 255, 255, .3);
-      border-radius: 999px;
-      background: rgba(239, 68, 68, .86);
-      color: #fff;
-      font-weight: 900;
-    }
-    .story-camera-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 92;
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 12px;
-      padding: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 14px);
-      background: rgba(9, 14, 28, .96);
-      color: #fff;
-    }
-    .story-camera-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .story-camera-head strong {
-      font-size: 15px;
-      font-weight: 900;
-    }
-    .story-camera-close {
-      width: 38px;
-      height: 38px;
-      border: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .12);
-      color: #fff;
-      font-size: 24px;
-      font-weight: 900;
-    }
-    .story-camera-preview {
-      min-height: 0;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      border-radius: 12px;
-      background: #05070d;
-    }
-    .story-camera-preview video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .story-camera-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .story-camera-actions button {
-      min-height: 46px;
-      border: 0;
-      border-radius: 999px;
-      font-weight: 900;
-    }
-    .story-camera-capture {
-      background: #fff;
-      color: var(--ink);
-    }
-    .story-camera-gallery {
-      background: rgba(255, 255, 255, .14);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, .28) !important;
-    }
     @media (max-width: 520px) {
       .android-install-prompt {
         grid-template-columns: 1fr auto;
@@ -2127,37 +1722,6 @@
     }
     .admin-only[hidden] { display: none !important; }
     [hidden] { display: none !important; }
-    .story-camera-input {
-      display: none !important;
-    }
-    body.drawer-open #drawer {
-      position: fixed !important;
-      inset: 0 !important;
-      z-index: 10000 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      max-height: 100dvh !important;
-      display: grid !important;
-      grid-template-rows: auto 1fr !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-      background: #fff !important;
-    }
-    body.drawer-open #drawerBackdrop {
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-    body.message-open #messageView:not([hidden]) {
-      display: grid !important;
-      min-height: 0;
-    }
-    body.message-open #messageView.message-thread-view:not([hidden]) {
-      display: flex !important;
-    }
   </style>
 </head>
 <body class="locked">
@@ -2217,19 +1781,8 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.06.03.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.06.04.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
-      </section>
-      <section id="storySection" class="story-section" aria-label="Klinik story">
-        <div class="story-head">
-          <strong>Klinik story</strong>
-          <small id="storyCountLabel">0 paylaşım</small>
-        </div>
-        <input id="storyImageFile" class="story-camera-input" type="file" accept="image/*,video/*" capture="environment">
-        <div id="storyTrack" class="story-track">
-          <div class="story-empty">Henüz paylaşım yok.</div>
-        </div>
-        <div id="storyAdminStatus" class="import-status"></div>
       </section>
       <div class="search">
         <input id="searchInput" type="search" placeholder="Hekim ara" autocomplete="off">
@@ -2392,7 +1945,7 @@
   </main>
 
   <div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
-  <aside id="drawer" class="drawer" aria-label="Menü" aria-hidden="true" hidden>
+  <aside id="drawer" class="drawer" aria-label="Menü" aria-hidden="true">
     <div class="drawer-head">
       <h2><span class="drawer-user-icon" aria-hidden="true">👤</span><span id="drawerUserTitle">Kullanıcı</span></h2>
       <button id="drawerClose" class="drawer-close" type="button" aria-label="Kapat">×</button>
@@ -2415,7 +1968,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.06.03.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.06.04.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -2430,44 +1983,6 @@
   </div>
 
   <div id="toastArea" class="toast-area" aria-live="polite" aria-atomic="true"></div>
-  <div id="storyViewer" class="story-viewer" hidden>
-    <div class="story-progress"><span id="storyProgressBar"></span></div>
-    <div class="story-viewer-head">
-      <img id="storyViewerAvatar" alt="">
-      <div class="story-viewer-title">
-        <strong id="storyViewerPatient"></strong>
-        <small id="storyViewerMeta"></small>
-      </div>
-      <button id="storyCloseButton" class="story-close" type="button" aria-label="Kapat">×</button>
-    </div>
-    <div class="story-image-wrap">
-      <button id="storyPrevZone" class="story-nav-zone left" type="button" aria-label="Önceki story"></button>
-      <img id="storyViewerImage" alt="">
-      <video id="storyViewerVideo" muted playsinline hidden></video>
-      <button id="storyNextZone" class="story-nav-zone right" type="button" aria-label="Sonraki story"></button>
-    </div>
-    <div class="story-viewer-foot">
-      <p id="storyViewerCaption">Defekasyon görüldü</p>
-      <div class="story-viewer-actions">
-        <button id="storyDeleteButton" class="story-delete" type="button" hidden>Sil</button>
-        <button id="storyDownloadButton" class="story-download" type="button">İndir</button>
-        <button id="storyPauseButton" class="story-pause" type="button">Duraklat</button>
-      </div>
-    </div>
-  </div>
-  <div id="storyCameraModal" class="story-camera-modal" hidden>
-    <div class="story-camera-head">
-      <strong>Hikaye kamerası</strong>
-      <button id="storyCameraCloseButton" class="story-camera-close" type="button" aria-label="Kapat">×</button>
-    </div>
-    <div class="story-camera-preview">
-      <video id="storyCameraPreview" autoplay muted playsinline></video>
-    </div>
-    <div class="story-camera-actions">
-      <button id="storyCameraCaptureButton" class="story-camera-capture" type="button">Çek ve paylaş</button>
-      <button id="storyGalleryButton" class="story-camera-gallery" type="button">Galeriden seç</button>
-    </div>
-  </div>
   <div id="notificationPermissionPrompt" class="notification-permission" hidden>
     <p><strong>Bildirimlere izin ver</strong><br>İcap ve görev değişikliklerinde sistem bildirimi almak için izin ver.</p>
     <div class="notification-permission-actions">
@@ -2492,7 +2007,6 @@
     const messageThreadActionStorageKey = "vetamerikan-shift-message-thread-actions";
     const deletedMessageStorageKey = "vetamerikan-shift-deleted-message-ids";
     const messageReactionStorageKey = "vetamerikan-shift-message-reactions";
-    const viewedStoriesStorageKey = "vetamerikan-shift-viewed-stories";
     const androidInstallDismissedKey = "vetamerikan-shift-android-install-dismissed";
     const androidFcmTokenStorageKey = "vetamerikan-shift-android-fcm-token";
     const supabaseUrl = "https://hmbqrccjuiknlqdzoltx.supabase.co";
@@ -2502,21 +2016,16 @@
     const notificationTable = "shift_notifications";
     const messageTable = "shift_messages";
     const messageReactionTable = "shift_message_reactions";
-    const storyTable = "shift_stories";
     const pushTokenTable = "shift_push_tokens";
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.06.03";
-    const storyDurationMs = 15000;
-    const storyLifetimeMs = 24 * 60 * 60 * 1000;
-    const storyRetentionMs = 48 * 60 * 60 * 1000;
+    const appVersion = "2026.08.06.04";
     const appUpdateManifestUrls = [
-      "https://raw.githubusercontent.com/Vetmaster/Vetmaster-vetamerikan-shift-asistan_3.0/main/app-update.json",
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
       "https://hasansargin.github.io/vetamerikan-shift-asistan/app-update.json",
-      "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json"
+      "https://hasansargin.github.io/Vetamerikan-Shift-Asistan/app-update.json"
     ];
     const appUpdateDismissedKey = "vetamerikan-shift-update-dismissed-version";
     const notificationReadMarkerTitle = "__VSA_READ__";
@@ -2651,11 +2160,11 @@
       const I = addIcapToRaw;
       return [
         ["Cerrahi","Emine Esma Çerez","60371",["10-16","","8-17","8-17","S","8-17","8-17","10-16","","8-17","8-17","S","8-17","8-17","","",I("8-17"),I("8-17"),I("S"),"","","","","8-17","8-17","S","8-17","8-17","10-16","","8-17"]],
-        ["Cerrahi","Nihan Dikbaş Tsatsaronis","60313",["","12-22",I("A"),I("A"),I("S"),I("A"),I(""),I("A"),I("A"),"8-18","8-18","8-18","8-18","","","12-22","12-22","12-22","12-22","12-22","","","","","","","","","","",""]],
-        ["Cerrahi","Burak Gümürcünler","60455",[I("12-22"),I(""),"S","8-18","A","8-18","12-22","","","A","A","A","A","A","A","","","8-18","8-18","8-18","","","","","","","","","","",""]],
-        ["Cerrahi","Yağmur Koçak","60502",["S","","S","S","S","S","S","S","",I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),"S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
+        ["Cerrahi","Nihan Dikbaş Tsatsaronis","60313",["","12-22",I("A"),I("A"),I("S"),I("A"),I(""),I("A"),I("A"),"8-18","8-18","8-18","","","","","","","","","","","","","","","","","","",""]],
+        ["Cerrahi","Burak Gümürcünler","60455",[I("12-22"),I(""),"S","S","A","S","A","","","12-22","12-22","12-22","","","","","","","","","","","","","","","","","","",""]],
+        ["Cerrahi","Yağmur Koçak","60502",["S","","S","S","S","S","S","S","",I("S"),I("S"),I("S"),I("S"),I("S"),I(""),I(""),"S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
         ["Cerrahi","Simge Ayhan","60548",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","","","","","","","","","","","","","","",""]],
-        ["Dahiliye","Öykü Sargın","60374",["S","","S","S","S","S","S","S","","","","","","","","",I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),I("S")]],
+        ["Dahiliye","Öykü Sargın","60374",["S","","S","S","S","S","S","S","","","","","","","","",I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),"S"]],
         ["Dahiliye","Emre Külük","60399",[I(""),I("S"),I("12-22"),I("10-20"),I("12-22"),I("10-20"),I("12-22"),I(""),I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),"12-22","10-20","12-22","10-20","12-22","12-22","","","","","","","","","12-22"]],
         ["Dahiliye","Efrahim Sargın","60373",["S","","S","S","S","S","S","S","","","","","","","","","S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
         ["Prof. Asistanı","Özgecan Küleyinoğlu","60314",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
@@ -2834,7 +2343,6 @@
     let supabaseNotificationChannel = null;
     let supabaseMessageChannel = null;
     let supabaseMessageReactionChannel = null;
-    let supabaseStoryChannel = null;
     let supabasePollTimer = null;
     let lastRemoteFingerprint = "";
     let lastNotificationFingerprint = "";
@@ -2845,14 +2353,6 @@
     let activeMessagePeer = "";
     let activeMessageReturnScreen = "";
     let bicarbTimingMode = "duration";
-    let clinicStories = [];
-    let activeStoryIndex = -1;
-    let storyRemainingMs = storyDurationMs;
-    let storyLastTick = 0;
-    let storyPaused = false;
-    let storyTimer = null;
-    let storyUploadBusy = false;
-    let storyCameraStream = null;
     let hasLoadedRemoteOverrides = false;
     let suppressAddonNotifications = false;
     const pendingOverrideKeys = new Set();
@@ -2873,9 +2373,6 @@
       searchBar: document.querySelector(".search"),
       today: document.getElementById("todayButton"),
       dayStrip: document.getElementById("dayStrip"),
-      storySection: document.getElementById("storySection"),
-      storyTrack: document.getElementById("storyTrack"),
-      storyCountLabel: document.getElementById("storyCountLabel"),
       tabGroups: Array.from(document.querySelectorAll(".shift-tabs")),
       tabs: Array.from(document.querySelectorAll(".shift-tab")),
       morningTabCount: document.getElementById("morningTabCount"),
@@ -2912,8 +2409,6 @@
       excelDatabaseTools: document.getElementById("excelDatabaseTools"),
       excelFile: document.getElementById("excelFile"),
       excelImportButton: document.getElementById("excelImportButton"),
-      storyImageFile: document.getElementById("storyImageFile"),
-      storyAdminStatus: document.getElementById("storyAdminStatus"),
       calculationToolsAccordion: document.getElementById("calculationToolsAccordion"),
       bicarbToolButton: document.getElementById("bicarbToolButton"),
       calciumToolButton: document.getElementById("calciumToolButton"),
@@ -2958,26 +2453,7 @@
       androidInstallText: document.getElementById("androidInstallText"),
       androidInstallLink: document.getElementById("androidInstallLink"),
       androidInstallDismiss: document.getElementById("androidInstallDismiss"),
-      drawerAndroidInstallLink: document.getElementById("drawerAndroidInstallLink"),
-      storyViewer: document.getElementById("storyViewer"),
-      storyProgressBar: document.getElementById("storyProgressBar"),
-      storyViewerAvatar: document.getElementById("storyViewerAvatar"),
-      storyViewerPatient: document.getElementById("storyViewerPatient"),
-      storyViewerMeta: document.getElementById("storyViewerMeta"),
-      storyViewerImage: document.getElementById("storyViewerImage"),
-      storyViewerVideo: document.getElementById("storyViewerVideo"),
-      storyPrevZone: document.getElementById("storyPrevZone"),
-      storyNextZone: document.getElementById("storyNextZone"),
-      storyViewerCaption: document.getElementById("storyViewerCaption"),
-      storyCloseButton: document.getElementById("storyCloseButton"),
-      storyDeleteButton: document.getElementById("storyDeleteButton"),
-      storyDownloadButton: document.getElementById("storyDownloadButton"),
-      storyPauseButton: document.getElementById("storyPauseButton"),
-      storyCameraModal: document.getElementById("storyCameraModal"),
-      storyCameraPreview: document.getElementById("storyCameraPreview"),
-      storyCameraCloseButton: document.getElementById("storyCameraCloseButton"),
-      storyCameraCaptureButton: document.getElementById("storyCameraCaptureButton"),
-      storyGalleryButton: document.getElementById("storyGalleryButton")
+      drawerAndroidInstallLink: document.getElementById("drawerAndroidInstallLink")
     };
 
     function norm(text) {
@@ -3083,14 +2559,6 @@
       return currentUsername() === appUsername;
     }
 
-    function canViewStorySection() {
-      return isAdminUser() || messageUser(currentUsername()) === "hasansar";
-    }
-
-    function canShareStories() {
-      return isAdminUser() || messageUser(currentUsername()) === "hasansar";
-    }
-
     function updateUserBadge() {
       const username = currentUsername() || "";
       els.userBadge.innerHTML = `
@@ -3105,7 +2573,6 @@
     }
 
     function updateAdminVisibility() {
-      els.storySection.hidden = !canViewStorySection();
       els.excelDatabaseTools.hidden = !isAdminUser();
       els.calculationToolsAccordion.hidden = !isAdminUser();
       els.bicarbToolButton.hidden = !isAdminUser();
@@ -3564,7 +3031,6 @@
       activeMessagePeer = "";
       activeMessageReturnScreen = "";
       profileEditContext = null;
-      document.body.classList.remove("message-open");
       els.app.classList.remove("profile-mode", "notification-mode", "message-mode");
       els.app.classList.remove("bicarb-mode");
       els.app.classList.remove("calcium-mode");
@@ -3572,7 +3038,7 @@
       els.profileView.innerHTML = "";
       els.notificationView.hidden = true;
       els.notificationView.innerHTML = "";
-      els.messageView.setAttribute("hidden", "");
+      els.messageView.hidden = true;
       els.messageView.innerHTML = "";
       els.bicarbView.hidden = true;
       els.calciumView.hidden = true;
@@ -4044,17 +3510,6 @@
       return date.toLocaleString("tr-TR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
     }
 
-    function relativeStoryTimeLabel(createdAt) {
-      const time = safeTimeValue(createdAt);
-      if (!time) return "az önce";
-      const diffMs = Math.max(0, Date.now() - time);
-      const minute = 60 * 1000;
-      const hour = 60 * minute;
-      if (diffMs < minute) return "az önce";
-      if (diffMs < hour) return `${Math.floor(diffMs / minute)} dakika önce`;
-      return `${Math.floor(diffMs / hour)} saat önce`;
-    }
-
     function savedMessages() {
       try {
         return JSON.parse(localStorage.getItem(messageListStorageKey) || "[]");
@@ -4313,7 +3768,7 @@
     }
 
     function messageUser(value) {
-      return authUsername(String(value || "").split("@")[0] || "");
+      return authUsername(value || "");
     }
 
     function doctorNameForUser(username) {
@@ -5078,8 +4533,7 @@
       closeCalciumTool();
       closeDrawer();
       closeCodeMenu();
-      document.body.classList.add("message-open");
-      els.messageView.removeAttribute("hidden");
+      els.messageView.hidden = false;
       els.app.classList.add("message-mode");
       activeMessageReturnScreen = fromProfile ? "profile" : "";
       if (sicil) renderMessageThread(sicil, options.peer || "", { pushHistory: false, fromProfile });
@@ -5091,10 +4545,9 @@
       activeMessageSicil = null;
       activeMessagePeer = "";
       activeMessageReturnScreen = "";
-      document.body.classList.remove("message-open");
       els.app.classList.remove("message-mode");
       els.messageView.classList.remove("message-thread-view");
-      els.messageView.setAttribute("hidden", "");
+      els.messageView.hidden = true;
       els.messageView.innerHTML = "";
     }
 
@@ -5439,543 +4892,6 @@
       }, { includeCurrentUser: true });
     }
 
-    function storyFromRecord(record) {
-      return {
-        id: String(record.id || ""),
-        patientName: record.patient_name || "Hasta",
-        caption: record.caption || "Defekasyon görüldü",
-        imageData: record.image_data || "",
-        author: record.author || "",
-        createdAt: record.created_at || new Date().toISOString()
-      };
-    }
-
-    function isStoryVisible(item) {
-      return Date.now() - safeTimeValue(item.createdAt) <= storyLifetimeMs;
-    }
-
-    function sortStories(items) {
-      const viewedIds = viewedStoryIds();
-      return [...items]
-        .filter(item => item.id && item.imageData)
-        .filter(isStoryVisible)
-        .sort((a, b) => {
-          const aViewed = viewedIds.has(String(a.id || ""));
-          const bViewed = viewedIds.has(String(b.id || ""));
-          if (aViewed !== bViewed) return aViewed ? 1 : -1;
-          return safeTimeValue(b.createdAt) - safeTimeValue(a.createdAt);
-        })
-        .slice(0, 40);
-    }
-
-    function upsertClinicStory(item) {
-      const index = clinicStories.findIndex(story => story.id === item.id);
-      if (index >= 0) clinicStories[index] = { ...clinicStories[index], ...item };
-      else clinicStories.unshift(item);
-      clinicStories = sortStories(clinicStories);
-      renderStoryStrip();
-    }
-
-    function viewedStoryIds() {
-      try {
-        const value = JSON.parse(localStorage.getItem(viewedStoriesStorageKey) || "[]");
-        return Array.isArray(value) ? new Set(value.map(String)) : new Set();
-      } catch {
-        return new Set();
-      }
-    }
-
-    function hasViewedStory(id) {
-      return viewedStoryIds().has(String(id || ""));
-    }
-
-    function markStoryViewed(id) {
-      const cleanId = String(id || "");
-      if (!cleanId) return;
-      const ids = viewedStoryIds();
-      ids.add(cleanId);
-      localStorage.setItem(viewedStoriesStorageKey, JSON.stringify(Array.from(ids).slice(-300)));
-    }
-
-    function isStoryVideo(dataUrl = "") {
-      return String(dataUrl).startsWith("data:video/");
-    }
-
-    function storyThumbMarkup(story) {
-      return `<img src="${storyAuthorAvatarSrc(story.author)}" alt="">`;
-    }
-
-    function storyAuthorAvatarSrc(author) {
-      const initials = escapeHtml(messageInitials(author) || "KU");
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="84" height="84" viewBox="0 0 84 84">
-          <defs>
-            <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-              <stop stop-color="#e7f5f6"/>
-              <stop offset="1" stop-color="#f7fafc"/>
-            </linearGradient>
-          </defs>
-          <rect width="84" height="84" rx="42" fill="url(#g)"/>
-          <text x="42" y="50" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="27" font-weight="900" fill="#24427c">${initials}</text>
-        </svg>
-      `;
-      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-    }
-
-    function storyAddButtonMarkup() {
-      const initials = escapeHtml(messageInitials(currentUsername()) || "AD");
-      return `
-        <button class="story-button story-add-button" type="button" data-story-add aria-label="Hikaye ekle">
-          <span class="story-thumb">
-            <span class="story-thumb-initials">${initials}</span>
-          </span>
-          <span class="story-plus-badge" aria-hidden="true">+</span>
-          <span>Hikayem</span>
-        </button>
-      `;
-    }
-
-    function profileStoriesMarkup(row) {
-      const profileUser = userForDoctor(row);
-      if (!profileUser) return "";
-      const stories = sortStories(clinicStories)
-        .filter(story => messageUser(story.author) === profileUser);
-      if (!stories.length) return "";
-      return `
-        <section class="profile-story-section" aria-label="Paylaşılan storyler">
-          <strong>Paylaştığı storyler</strong>
-          <div class="profile-story-track">
-            ${stories.map(story => {
-              const viewedClass = hasViewedStory(story.id) ? "viewed" : "unviewed";
-              return `
-                <button class="story-button ${viewedClass}" type="button" data-profile-story-id="${escapeHtml(story.id)}" aria-label="${escapeHtml(story.patientName)} story">
-                  <span class="story-thumb">${storyThumbMarkup(story)}</span>
-                  <span>${escapeHtml(story.patientName)}</span>
-                </button>
-              `;
-            }).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    function renderStoryStrip() {
-      if (!els.storyTrack) return;
-      const count = clinicStories.length;
-      els.storyCountLabel.textContent = `${count} paylaşım`;
-      const storyButtons = clinicStories.map((story, index) => {
-        const viewedClass = hasViewedStory(story.id) ? "viewed" : "unviewed";
-        return `
-        <button class="story-button ${viewedClass}" type="button" data-story-index="${index}" aria-label="${escapeHtml(story.patientName)} story">
-          <span class="story-thumb">${storyThumbMarkup(story)}</span>
-          <span>${escapeHtml(story.patientName)}</span>
-        </button>
-      `;
-      }).join("");
-      const addButton = canShareStories() ? storyAddButtonMarkup() : "";
-      els.storyTrack.innerHTML = `${addButton}${storyButtons || '<div class="story-empty">Henüz paylaşım yok.</div>'}`;
-      els.storyTrack.querySelector("[data-story-add]")?.addEventListener("click", openStoryCamera);
-      els.storyTrack.querySelectorAll("[data-story-index]").forEach(button => {
-        button.addEventListener("click", () => openStoryViewer(Number(button.dataset.storyIndex || 0)));
-      });
-    }
-
-    function renderStoryViewer() {
-      const story = clinicStories[activeStoryIndex];
-      if (!story) return;
-      els.storyViewerAvatar.src = storyAuthorAvatarSrc(story.author);
-      if (isStoryVideo(story.imageData)) {
-        els.storyViewerImage.hidden = true;
-        els.storyViewerImage.removeAttribute("src");
-        els.storyViewerVideo.hidden = false;
-        if (els.storyViewerVideo.src !== story.imageData) {
-          els.storyViewerVideo.src = story.imageData;
-          els.storyViewerVideo.currentTime = 0;
-        }
-        if (storyPaused) els.storyViewerVideo.pause();
-        else els.storyViewerVideo.play().catch(() => {});
-      } else {
-        els.storyViewerVideo.pause();
-        els.storyViewerVideo.hidden = true;
-        els.storyViewerVideo.removeAttribute("src");
-        els.storyViewerImage.hidden = false;
-        els.storyViewerImage.src = story.imageData;
-      }
-      els.storyViewerPatient.textContent = story.patientName;
-      const authorName = story.author ? displayNameForUser(story.author) : "Kullanıcı";
-      els.storyViewerMeta.textContent = `${authorName} tarafından ${relativeStoryTimeLabel(story.createdAt)} paylaşıldı`;
-      els.storyViewerCaption.textContent = story.caption || "Defekasyon görüldü";
-      els.storyDeleteButton.hidden = !canDeleteStory(story);
-      els.storyPauseButton.textContent = storyPaused ? "Devam" : "Duraklat";
-      const progress = Math.max(0, Math.min(100, ((storyDurationMs - storyRemainingMs) / storyDurationMs) * 100));
-      els.storyProgressBar.style.width = `${progress}%`;
-    }
-
-    function stopStoryTimer() {
-      if (storyTimer) window.clearInterval(storyTimer);
-      storyTimer = null;
-    }
-
-    function startStoryTimer() {
-      stopStoryTimer();
-      storyLastTick = Date.now();
-      storyTimer = window.setInterval(() => {
-        const now = Date.now();
-        if (!storyPaused) {
-          storyRemainingMs -= now - storyLastTick;
-          if (storyRemainingMs <= 0) {
-            openStoryViewer(activeStoryIndex + 1);
-            return;
-          }
-        }
-        storyLastTick = now;
-        renderStoryViewer();
-      }, 100);
-    }
-
-    function openStoryViewer(index = 0) {
-      if (!clinicStories.length) return;
-      if (index < 0) index = 0;
-      if (index >= clinicStories.length) {
-        closeStoryViewer();
-        return;
-      }
-      const openedStory = clinicStories[Math.max(0, index)];
-      markStoryViewed(openedStory?.id);
-      clinicStories = sortStories(clinicStories);
-      activeStoryIndex = clinicStories.findIndex(story => story.id === openedStory?.id);
-      if (activeStoryIndex < 0) activeStoryIndex = Math.max(0, index);
-      renderStoryStrip();
-      storyRemainingMs = storyDurationMs;
-      storyPaused = false;
-      els.storyViewer.hidden = false;
-      renderStoryViewer();
-      startStoryTimer();
-    }
-
-    function changeStory(direction) {
-      if (activeStoryIndex < 0) return;
-      openStoryViewer(activeStoryIndex + direction);
-    }
-
-    function closeStoryViewer() {
-      stopStoryTimer();
-      activeStoryIndex = -1;
-      els.storyViewer.hidden = true;
-      els.storyProgressBar.style.width = "0%";
-      els.storyViewerVideo.pause();
-      els.storyViewerVideo.removeAttribute("src");
-    }
-
-    function toggleStoryPause() {
-      storyPaused = !storyPaused;
-      storyLastTick = Date.now();
-      if (!els.storyViewerVideo.hidden) {
-        if (storyPaused) els.storyViewerVideo.pause();
-        else els.storyViewerVideo.play().catch(() => {});
-      }
-      renderStoryViewer();
-    }
-
-    function storyDownloadExtension(dataUrl = "") {
-      const match = String(dataUrl).match(/^data:([^;]+);/);
-      const mime = match?.[1] || "";
-      if (mime.includes("png")) return "png";
-      if (mime.includes("webp")) return "webp";
-      if (mime.includes("mp4")) return "mp4";
-      if (mime.includes("quicktime")) return "mov";
-      if (mime.startsWith("video/")) return "video";
-      return "jpg";
-    }
-
-    function downloadActiveStory() {
-      const story = clinicStories[activeStoryIndex];
-      if (!story?.imageData) return;
-      const safePatient = norm(story.patientName || "hasta").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "hasta";
-      const link = document.createElement("a");
-      link.href = story.imageData;
-      link.download = `${safePatient}-story.${storyDownloadExtension(story.imageData)}`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    }
-
-    function canDeleteStory(story) {
-      if (!story) return false;
-      return isAdminUser() || messageUser(story.author) === messageUser(currentUsername());
-    }
-
-    async function deleteActiveStory() {
-      const story = clinicStories[activeStoryIndex];
-      if (!canDeleteStory(story)) return;
-      if (!window.confirm("Bu story silinsin mi?")) return;
-      const id = String(story.id || "");
-      const nextIndex = activeStoryIndex >= clinicStories.length - 1 ? activeStoryIndex - 1 : activeStoryIndex;
-      try {
-        clinicStories = clinicStories.filter(item => item.id !== id);
-        renderStoryStrip();
-        if (clinicStories.length && nextIndex >= 0) {
-          openStoryViewer(nextIndex);
-        } else {
-          closeStoryViewer();
-        }
-        await supabaseRequest(`${storyTable}?id=eq.${encodeURIComponent(id)}`, {
-          method: "DELETE",
-          headers: { Prefer: "return=minimal" }
-        });
-        setStoryAdminStatus("Story silindi.");
-      } catch (error) {
-        setStoryAdminStatus(`Story silinemedi: ${error.message}`);
-        await loadSupabaseStories({ silent: true });
-      }
-    }
-
-    function fileToDataUrl(file, errorMessage = "Dosya okunamadı.") {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ""));
-        reader.onerror = () => reject(new Error(errorMessage));
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function imageFileToDataUrl(file) {
-      return fileToDataUrl(file, "Fotoğraf okunamadı.");
-    }
-
-    function loadImageElement(src) {
-      return new Promise((resolve, reject) => {
-        const image = new Image();
-        image.onload = () => resolve(image);
-        image.onerror = () => reject(new Error("Fotoğraf işlenemedi."));
-        image.src = src;
-      });
-    }
-
-    async function resizeStoryImage(file) {
-      const dataUrl = await imageFileToDataUrl(file);
-      const image = await loadImageElement(dataUrl);
-      const maxSide = 1280;
-      const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(image.width * scale));
-      canvas.height = Math.max(1, Math.round(image.height * scale));
-      const context = canvas.getContext("2d");
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL("image/jpeg", 0.82);
-    }
-
-    function getVideoDuration(file) {
-      return new Promise((resolve, reject) => {
-        const url = URL.createObjectURL(file);
-        const video = document.createElement("video");
-        video.preload = "metadata";
-        video.onloadedmetadata = () => {
-          URL.revokeObjectURL(url);
-          resolve(Number(video.duration || 0));
-        };
-        video.onerror = () => {
-          URL.revokeObjectURL(url);
-          reject(new Error("Video süresi okunamadı."));
-        };
-        video.src = url;
-      });
-    }
-
-    async function prepareStoryMedia(file) {
-      if (file.type.startsWith("image/")) return resizeStoryImage(file);
-      if (file.type.startsWith("video/")) {
-        const maxVideoBytes = 15 * 1024 * 1024;
-        if (file.size > maxVideoBytes) {
-          throw new Error("Video dosyası 15 MB'dan küçük olmalı.");
-        }
-        const duration = await getVideoDuration(file);
-        if (!duration || duration > 15.5) {
-          throw new Error("Video 15 saniyeyi geçmemeli.");
-        }
-        return fileToDataUrl(file, "Video okunamadı.");
-      }
-      throw new Error("Sadece fotoğraf veya video paylaşılabilir.");
-    }
-
-    function setStoryAdminStatus(message = "") {
-      if (els.storyAdminStatus) els.storyAdminStatus.textContent = message;
-    }
-
-    function closeStoryCameraModal() {
-      if (storyCameraStream) {
-        storyCameraStream.getTracks().forEach(track => track.stop());
-      }
-      storyCameraStream = null;
-      if (els.storyCameraPreview) els.storyCameraPreview.srcObject = null;
-      if (els.storyCameraModal) els.storyCameraModal.hidden = true;
-    }
-
-    function openStoryGalleryPicker() {
-      if (!canShareStories() || storyUploadBusy) return;
-      setStoryAdminStatus("");
-      closeStoryCameraModal();
-      els.storyImageFile.value = "";
-      els.storyImageFile.click();
-    }
-
-    async function openStoryCamera() {
-      if (!canShareStories() || storyUploadBusy) return;
-      setStoryAdminStatus("");
-      if (!navigator.mediaDevices?.getUserMedia) {
-        openStoryGalleryPicker();
-        return;
-      }
-      try {
-        storyCameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } },
-          audio: false
-        });
-        els.storyCameraPreview.srcObject = storyCameraStream;
-        els.storyCameraModal.hidden = false;
-      } catch (error) {
-        setStoryAdminStatus("Kamera açılamadı. Galeriden seçim açıldı.");
-        openStoryGalleryPicker();
-      }
-    }
-
-    function captureStoryCameraFrame() {
-      return new Promise((resolve, reject) => {
-        const video = els.storyCameraPreview;
-        if (!video?.videoWidth || !video.videoHeight) {
-          reject(new Error("Kamera görüntüsü hazır değil."));
-          return;
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const context = canvas.getContext("2d");
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob(blob => {
-          if (!blob) {
-            reject(new Error("Fotoğraf oluşturulamadı."));
-            return;
-          }
-          resolve(new File([blob], `story-camera-${Date.now()}.jpg`, { type: "image/jpeg" }));
-        }, "image/jpeg", 0.86);
-      });
-    }
-
-    async function captureAndShareStoryCamera() {
-      if (!canShareStories() || storyUploadBusy) return;
-      try {
-        const file = await captureStoryCameraFrame();
-        closeStoryCameraModal();
-        const details = askStoryShareDetails();
-        if (!details) return;
-        await shareDefecationStory(details.patientName, file, details.caption);
-      } catch (error) {
-        setStoryAdminStatus(`Fotoğraf çekilemedi: ${error.message}`);
-      }
-    }
-
-    async function handleStoryMediaSelected() {
-      const file = els.storyImageFile.files?.[0];
-      if (!file) return;
-      const details = askStoryShareDetails();
-      if (!details) {
-        els.storyImageFile.value = "";
-        return;
-      }
-      await shareDefecationStory(details.patientName, file, details.caption);
-    }
-
-    function askStoryShareDetails() {
-      const patientName = window.prompt("Hasta adı", "")?.trim();
-      if (!patientName) {
-        setStoryAdminStatus("Story paylaşmak için hasta adı girilmeli.");
-        return null;
-      }
-      const captionInput = window.prompt("Açıklama", "Defekasyon görüldü");
-      const caption = captionInput === null ? "Defekasyon görüldü" : (captionInput.trim() || "Defekasyon görüldü");
-      return { patientName, caption };
-    }
-
-    async function shareDefecationStory(patientName, file, caption = "Defekasyon görüldü") {
-      if (!canShareStories()) return;
-      if (!patientName || !file) {
-        setStoryAdminStatus("Hasta adı ve medya seçilmeli.");
-        return;
-      }
-      try {
-        storyUploadBusy = true;
-        setStoryAdminStatus("Medya hazırlanıyor...");
-        const imageData = await prepareStoryMedia(file);
-        const item = {
-          id: `story-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-          patientName,
-          caption,
-          imageData,
-          author: currentUsername() || "",
-          createdAt: new Date().toISOString()
-        };
-        upsertClinicStory(item);
-        setStoryAdminStatus("Supabase'e kaydediliyor...");
-        await supabaseRequest(`${storyTable}?on_conflict=id`, {
-          method: "POST",
-          headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-          body: JSON.stringify({
-            id: item.id,
-            patient_name: item.patientName,
-            caption: item.caption,
-            image_data: item.imageData,
-            author: item.author,
-            created_at: item.createdAt
-          })
-        });
-        els.storyImageFile.value = "";
-        setStoryAdminStatus("Story paylaşıldı.");
-      } catch (error) {
-        setStoryAdminStatus(`Story paylaşılamadı: ${error.message}`);
-      } finally {
-        storyUploadBusy = false;
-      }
-    }
-
-    async function cleanupExpiredSupabaseStories() {
-      const now = Date.now();
-      if (cleanupExpiredSupabaseStories.lastRun && now - cleanupExpiredSupabaseStories.lastRun < 30 * 60 * 1000) return;
-      cleanupExpiredSupabaseStories.lastRun = now;
-      const cutoffIso = new Date(now - storyRetentionMs).toISOString();
-      await supabaseRequest(`${storyTable}?created_at=lt.${encodeURIComponent(cutoffIso)}`, {
-        method: "DELETE",
-        headers: { Prefer: "return=minimal" }
-      });
-    }
-
-    async function loadSupabaseStories({ silent = true } = {}) {
-      try {
-        await cleanupExpiredSupabaseStories().catch(() => {});
-        const records = await supabaseRequest(`${storyTable}?select=id,patient_name,caption,image_data,author,created_at&order=created_at.desc&limit=40`);
-        if (!Array.isArray(records)) return;
-        const fingerprint = JSON.stringify(records.map(record => [record.id, record.patient_name, record.created_at]));
-        if (fingerprint === loadSupabaseStories.lastFingerprint && silent) return;
-        loadSupabaseStories.lastFingerprint = fingerprint;
-        clinicStories = sortStories(records.map(storyFromRecord));
-        renderStoryStrip();
-      } catch (error) {
-        if (!silent && els.storyAdminStatus) {
-          els.storyAdminStatus.textContent = `Story listesi alınamadı: ${error.message}`;
-        }
-      }
-    }
-
-    function handleSupabaseStory(payload) {
-      if (payload.eventType === "DELETE") {
-        const id = String(payload.old?.id || "");
-        clinicStories = clinicStories.filter(story => story.id !== id);
-        renderStoryStrip();
-        return;
-      }
-      if (!["INSERT", "UPDATE"].includes(payload.eventType) || !payload.new?.id) return;
-      upsertClinicStory(storyFromRecord(payload.new));
-    }
-
     function shiftValueLabel(raw) {
       const base = baseRaw(raw);
       if (!base) return "İzinli";
@@ -6275,14 +5191,6 @@
           table: messageReactionTable
         }, handleSupabaseMessageReaction)
         .subscribe();
-      supabaseStoryChannel = supabaseClient
-        .channel("shift-stories-realtime")
-        .on("postgres_changes", {
-          event: "*",
-          schema: "public",
-          table: storyTable
-        }, handleSupabaseStory)
-        .subscribe();
     }
 
     function startSupabasePollingFallback() {
@@ -6292,7 +5200,6 @@
         await loadSupabaseNotifications({ silent: true });
         await loadSupabaseMessages({ silent: true });
         await loadSupabaseMessageReactions({ silent: true });
-        await loadSupabaseStories({ silent: true });
         supabasePollTimer = window.setTimeout(poll, document.hidden ? 5000 : 1500);
       };
       supabasePollTimer = window.setTimeout(poll, 1500);
@@ -6776,7 +5683,6 @@
           </div>
           <div class="profile-photo" aria-label="Profil fotoğrafı">${initials}</div>
         </div>
-        ${profileStoriesMarkup(row)}
         ${row.shiftless ? '<div class="empty">Bu profil şift listesinde yer almıyor.</div>' : `<div class="profile-days">
           ${entries.map(item => `
             <div class="profile-day${item.day.day === today ? " today" : ""}">
@@ -6793,12 +5699,6 @@
       els.app.classList.add("profile-mode");
       document.getElementById("profileBackButton").addEventListener("click", () => goBackOrClose(closeProfile));
       document.getElementById("profileMessageButton").addEventListener("click", () => openMessageCenter(row.sicil));
-      els.profileView.querySelectorAll("[data-profile-story-id]").forEach(button => {
-        button.addEventListener("click", () => {
-          const storyIndex = clinicStories.findIndex(story => story.id === button.dataset.profileStoryId);
-          if (storyIndex >= 0) openStoryViewer(storyIndex);
-        });
-      });
       els.profileView.querySelectorAll("[data-profile-code]").forEach(button => {
         button.addEventListener("click", () => {
           if (!isAdminUser()) return;
@@ -7002,19 +5902,15 @@
     }
 
     function openDrawer() {
-      document.body.classList.add("drawer-open");
-      els.drawer.removeAttribute("hidden");
       els.drawer.classList.add("open");
       els.drawer.setAttribute("aria-hidden", "false");
-      els.drawerBackdrop.removeAttribute("hidden");
+      els.drawerBackdrop.hidden = false;
     }
 
     function closeDrawer() {
-      document.body.classList.remove("drawer-open");
       els.drawer.classList.remove("open");
       els.drawer.setAttribute("aria-hidden", "true");
-      els.drawer.setAttribute("hidden", "");
-      els.drawerBackdrop.setAttribute("hidden", "");
+      els.drawerBackdrop.hidden = true;
     }
 
     function changeDay(delta) {
@@ -7229,22 +6125,6 @@
     els.androidInstallDismiss.addEventListener("click", dismissAndroidInstallPrompt);
     els.pushTestButton.addEventListener("click", sendPushTestNotification);
     els.excelImportButton.addEventListener("click", importExcelFile);
-    els.storyImageFile.addEventListener("change", handleStoryMediaSelected);
-    els.storyCloseButton.addEventListener("click", closeStoryViewer);
-    els.storyDeleteButton.addEventListener("click", deleteActiveStory);
-    els.storyDownloadButton.addEventListener("click", downloadActiveStory);
-    els.storyPauseButton.addEventListener("click", toggleStoryPause);
-    els.storyPrevZone.addEventListener("click", () => changeStory(-1));
-    els.storyNextZone.addEventListener("click", () => changeStory(1));
-    els.storyCameraCloseButton.addEventListener("click", closeStoryCameraModal);
-    els.storyCameraCaptureButton.addEventListener("click", captureAndShareStoryCamera);
-    els.storyGalleryButton.addEventListener("click", openStoryGalleryPicker);
-    els.storyViewerVideo.addEventListener("ended", () => {
-      if (!storyPaused) openStoryViewer(activeStoryIndex + 1);
-    });
-    els.storyViewer.addEventListener("click", event => {
-      if (event.target === els.storyViewer) closeStoryViewer();
-    });
     els.bicarbToolButton.addEventListener("click", openBicarbonateTool);
     els.calciumToolButton.addEventListener("click", openCalciumTool);
     els.bicarbBackButton.addEventListener("click", () => goBackOrClose(goHome));
@@ -7315,7 +6195,6 @@
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") {
         closeDrawer();
-        closeStoryViewer();
         profileEditContext = null;
         closeCodeMenu();
       }
@@ -7333,7 +6212,6 @@
     renderAppVersion();
     renderNotificationBadge();
     renderMessageBadge();
-    renderStoryStrip();
     updateNotificationStatus();
     updateAndroidInstallPrompt();
     checkForAppUpdate();
@@ -7344,7 +6222,6 @@
     loadSupabaseNotifications({ silent: false });
     loadSupabaseMessages({ silent: false });
     loadSupabaseMessageReactions({ silent: true });
-    loadSupabaseStories({ silent: false });
     startSupabaseRealtime();
     startSupabasePollingFallback();
   </script>
