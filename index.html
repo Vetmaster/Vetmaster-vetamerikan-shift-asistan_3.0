@@ -2127,6 +2127,37 @@
     }
     .admin-only[hidden] { display: none !important; }
     [hidden] { display: none !important; }
+    .story-camera-input {
+      display: none !important;
+    }
+    body.drawer-open #drawer {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 10000 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      display: grid !important;
+      grid-template-rows: auto 1fr !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      background: #fff !important;
+    }
+    body.drawer-open #drawerBackdrop {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+    body.message-open #messageView:not([hidden]) {
+      display: grid !important;
+      min-height: 0;
+    }
+    body.message-open #messageView.message-thread-view:not([hidden]) {
+      display: flex !important;
+    }
   </style>
 </head>
 <body class="locked">
@@ -2186,7 +2217,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.06.01.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.06.02.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <section id="storySection" class="story-section" aria-label="Klinik story">
@@ -2384,7 +2415,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.06.01.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.06.02.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -2476,7 +2507,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.06.01";
+    const appVersion = "2026.08.06.02";
     const storyDurationMs = 15000;
     const storyLifetimeMs = 24 * 60 * 60 * 1000;
     const storyRetentionMs = 48 * 60 * 60 * 1000;
@@ -3532,6 +3563,7 @@
       activeMessagePeer = "";
       activeMessageReturnScreen = "";
       profileEditContext = null;
+      document.body.classList.remove("message-open");
       els.app.classList.remove("profile-mode", "notification-mode", "message-mode");
       els.app.classList.remove("bicarb-mode");
       els.app.classList.remove("calcium-mode");
@@ -3539,7 +3571,7 @@
       els.profileView.innerHTML = "";
       els.notificationView.hidden = true;
       els.notificationView.innerHTML = "";
-      els.messageView.hidden = true;
+      els.messageView.setAttribute("hidden", "");
       els.messageView.innerHTML = "";
       els.bicarbView.hidden = true;
       els.calciumView.hidden = true;
@@ -5045,7 +5077,8 @@
       closeCalciumTool();
       closeDrawer();
       closeCodeMenu();
-      els.messageView.hidden = false;
+      document.body.classList.add("message-open");
+      els.messageView.removeAttribute("hidden");
       els.app.classList.add("message-mode");
       activeMessageReturnScreen = fromProfile ? "profile" : "";
       if (sicil) renderMessageThread(sicil, options.peer || "", { pushHistory: false, fromProfile });
@@ -5057,9 +5090,10 @@
       activeMessageSicil = null;
       activeMessagePeer = "";
       activeMessageReturnScreen = "";
+      document.body.classList.remove("message-open");
       els.app.classList.remove("message-mode");
       els.messageView.classList.remove("message-thread-view");
-      els.messageView.hidden = true;
+      els.messageView.setAttribute("hidden", "");
       els.messageView.innerHTML = "";
     }
 
@@ -6967,17 +7001,19 @@
     }
 
     function openDrawer() {
-      els.drawer.hidden = false;
+      document.body.classList.add("drawer-open");
+      els.drawer.removeAttribute("hidden");
       els.drawer.classList.add("open");
       els.drawer.setAttribute("aria-hidden", "false");
-      els.drawerBackdrop.hidden = false;
+      els.drawerBackdrop.removeAttribute("hidden");
     }
 
     function closeDrawer() {
+      document.body.classList.remove("drawer-open");
       els.drawer.classList.remove("open");
       els.drawer.setAttribute("aria-hidden", "true");
-      els.drawer.hidden = true;
-      els.drawerBackdrop.hidden = true;
+      els.drawer.setAttribute("hidden", "");
+      els.drawerBackdrop.setAttribute("hidden", "");
     }
 
     function changeDay(delta) {
