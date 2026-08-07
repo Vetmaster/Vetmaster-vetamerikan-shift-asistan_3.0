@@ -1290,20 +1290,19 @@
       left: 50%;
       top: calc(8px + env(safe-area-inset-top));
       z-index: 35;
-      min-width: 116px;
-      min-height: 36px;
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      min-height: 42px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      padding: 0 12px;
+      padding: 0;
       border: 1px solid rgba(20, 33, 61, .12);
       border-radius: 999px;
       background: rgba(255, 255, 255, .96);
       color: var(--ink);
       box-shadow: 0 10px 26px rgba(20, 33, 61, .16);
-      font-size: 12px;
-      font-weight: 900;
       opacity: 0;
       pointer-events: none;
       transform: translate(-50%, -52px) scale(.96);
@@ -1321,7 +1320,7 @@
       place-items: center;
       width: 18px;
       height: 18px;
-      font-size: 16px;
+      font-size: 20px;
       line-height: 1;
     }
     @keyframes pullSpin {
@@ -1840,7 +1839,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.07.02.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.07.03.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <div class="search">
@@ -2027,7 +2026,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.07.02.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.07.03.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -2043,7 +2042,6 @@
 
   <div id="pullRefreshIndicator" class="pull-refresh-indicator" aria-hidden="true">
     <span class="pull-refresh-icon">↻</span>
-    <span id="pullRefreshText">Yenile</span>
   </div>
   <div id="toastArea" class="toast-area" aria-live="polite" aria-atomic="true"></div>
   <div id="notificationPermissionPrompt" class="notification-permission" hidden>
@@ -2083,7 +2081,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.07.02";
+    const appVersion = "2026.08.07.03";
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
@@ -2500,7 +2498,6 @@
       drawerClose: document.getElementById("drawerClose"),
       drawerBackdrop: document.getElementById("drawerBackdrop"),
       pullRefreshIndicator: document.getElementById("pullRefreshIndicator"),
-      pullRefreshText: document.getElementById("pullRefreshText"),
       codeMenu: document.getElementById("codeMenu"),
       codeMenuBackdrop: document.getElementById("codeMenuBackdrop"),
       codeMenuTitle: document.getElementById("codeMenuTitle"),
@@ -5982,8 +5979,7 @@
 
     function initPullToRefresh() {
       const indicator = els.pullRefreshIndicator;
-      const label = els.pullRefreshText;
-      if (!indicator || !label) return;
+      if (!indicator) return;
       let startY = 0;
       let pulling = false;
       let armed = false;
@@ -5991,7 +5987,7 @@
       const threshold = 86;
 
       function canPullRefresh(event) {
-        if (refreshing || window.scrollY > 0) return false;
+        if (refreshing) return false;
         if (document.body.classList.contains("drawer-open")) return false;
         if (document.body.classList.contains("message-mode")) return false;
         if (event.target.closest("input, textarea, select, button, a, .drawer, .code-menu, .message-view, .messages-view, .profile-view:not([hidden])")) return false;
@@ -6003,7 +5999,6 @@
         armed = clamped >= threshold;
         indicator.classList.toggle("visible", clamped > 18);
         indicator.style.transform = `translate(-50%, ${Math.min(clamped / 2, 48)}px) scale(${armed ? 1 : .96})`;
-        label.textContent = armed ? "Bırak yenilensin" : "Yenile";
       }
 
       function resetPullState() {
@@ -6011,14 +6006,12 @@
         armed = false;
         indicator.classList.remove("visible", "refreshing");
         indicator.style.transform = "";
-        label.textContent = "Yenile";
       }
 
       function refreshPage() {
         refreshing = true;
         indicator.classList.add("visible", "refreshing");
         indicator.style.transform = "translate(-50%, 0) scale(1)";
-        label.textContent = "Yenileniyor";
         const url = new URL(window.location.href);
         url.searchParams.set("v", `${appVersion}-${Date.now()}`);
         window.location.replace(url.toString());
