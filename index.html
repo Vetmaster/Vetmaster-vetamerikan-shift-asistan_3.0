@@ -2663,7 +2663,7 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
-      closeDrawer();
+      closeDrawer({ syncHistory: false });
       closeCodeMenu();
     }
 
@@ -2722,6 +2722,8 @@
         openBicarbonateTool({ pushHistory: false });
       } else if (target.screen === "calcium") {
         openCalciumTool({ pushHistory: false });
+      } else if (target.screen === "drawer") {
+        openDrawer({ pushHistory: false });
       } else {
         render();
       }
@@ -3133,7 +3135,7 @@
       els.messageView.innerHTML = "";
       els.bicarbView.hidden = true;
       els.calciumView.hidden = true;
-      closeDrawer();
+      closeDrawer({ syncHistory: false });
       closeCodeMenu();
       state.day = activeDataset ? Math.min(dayForDataset(activeDataset), activeDays.length) : 1;
       state.shift = "morning";
@@ -5992,18 +5994,27 @@
       render();
     }
 
-    function openDrawer() {
+    function openDrawer(options = {}) {
+      if (options.pushHistory !== false) pushAppHistory("drawer");
       els.drawer.classList.add("open");
       els.drawer.setAttribute("aria-hidden", "false");
       els.drawerBackdrop.hidden = false;
       document.body.classList.add("drawer-open");
     }
 
-    function closeDrawer() {
+    function closeDrawer(options = {}) {
       els.drawer.classList.remove("open");
       els.drawer.setAttribute("aria-hidden", "true");
       els.drawerBackdrop.hidden = true;
       document.body.classList.remove("drawer-open");
+      if (
+        options.syncHistory !== false
+        && !isApplyingHistoryState
+        && window.history?.state?.vetamerikanShiftApp
+        && window.history.state.screen === "drawer"
+      ) {
+        replaceAppHistory("home");
+      }
     }
 
     function initDrawerSwipeBack() {
@@ -6026,7 +6037,7 @@
         const deltaX = touch.clientX - startX;
         const deltaY = touch.clientY - startY;
         if (deltaX < -60 && Math.abs(deltaY) < 80) {
-          closeDrawer();
+          goBackOrClose(closeDrawer);
         }
       }, { passive: true });
 
