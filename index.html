@@ -1839,7 +1839,7 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.07.05.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.07.06.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <div class="search">
@@ -2026,7 +2026,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.07.05.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.07.06.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -2081,7 +2081,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.07.05";
+    const appVersion = "2026.08.07.06";
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
@@ -6006,6 +6006,35 @@
       document.body.classList.remove("drawer-open");
     }
 
+    function initDrawerSwipeBack() {
+      let startX = 0;
+      let startY = 0;
+      let tracking = false;
+
+      window.addEventListener("touchstart", event => {
+        if (!document.body.classList.contains("drawer-open") || event.touches.length !== 1) return;
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        tracking = true;
+      }, { passive: true });
+
+      window.addEventListener("touchend", event => {
+        if (!tracking) return;
+        tracking = false;
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+        const deltaX = touch.clientX - startX;
+        const deltaY = touch.clientY - startY;
+        if (deltaX < -60 && Math.abs(deltaY) < 80) {
+          closeDrawer();
+        }
+      }, { passive: true });
+
+      window.addEventListener("touchcancel", () => {
+        tracking = false;
+      }, { passive: true });
+    }
+
     function initPullToRefresh() {
       const indicator = els.pullRefreshIndicator;
       if (!indicator) return;
@@ -6378,6 +6407,7 @@
     renderMessageBadge();
     updateNotificationStatus();
     updateAndroidInstallPrompt();
+    initDrawerSwipeBack();
     initPullToRefresh();
     checkForAppUpdate();
     render();
