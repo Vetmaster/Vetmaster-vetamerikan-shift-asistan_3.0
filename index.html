@@ -166,6 +166,34 @@
       border-bottom: 1px solid var(--line);
       backdrop-filter: blur(14px);
     }
+    .product-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+    .product-tabs[hidden] {
+      display: none !important;
+    }
+    body.native-shell .product-tabs {
+      display: none !important;
+    }
+    .product-tab {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0;
+      box-shadow: 0 8px 22px rgba(20, 33, 61, .06);
+    }
+    .product-tab.active {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+    }
     .brand {
       display: grid;
       gap: 10px;
@@ -652,7 +680,13 @@
     .app.calcium-mode .summary,
     .app.calcium-mode .search,
     .app.calcium-mode .day-strip,
-    .app.calcium-mode #doctorList {
+    .app.calcium-mode #doctorList,
+    .app.nucleus-mode .shift-tabs,
+    .app.nucleus-mode .summary,
+    .app.nucleus-mode .search,
+    .app.nucleus-mode .day-strip,
+    .app.nucleus-mode #doctorList,
+    .app.nucleus-mode #androidInstallPrompt {
       display: none;
     }
     .profile-view {
@@ -664,6 +698,55 @@
       display: grid;
       align-content: start;
       gap: 14px;
+    }
+    .nucleus-view {
+      min-height: min(720px, calc(100svh - 190px));
+      overflow: hidden;
+      padding: 0;
+    }
+    .nucleus-placeholder {
+      min-height: min(520px, calc(100svh - 220px));
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+    .nucleus-launch {
+      display: grid;
+      gap: 14px;
+      max-width: 420px;
+      width: 100%;
+    }
+    .nucleus-launch h2,
+    .nucleus-launch p {
+      margin: 0;
+    }
+    .nucleus-launch h2 {
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1.15;
+    }
+    .nucleus-launch p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .nucleus-launch button,
+    .nucleus-launch a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--brand);
+      border-radius: 8px;
+      background: var(--brand);
+      color: #fff;
+      padding: 0 14px;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: none;
     }
     #messageView.message-thread-view {
       display: flex;
@@ -1266,9 +1349,11 @@
       position: fixed;
       top: 0;
       right: 0;
+      bottom: 0;
       z-index: 50;
-      width: min(360px, 92vw);
-      height: 100svh;
+      width: min(420px, 100vw);
+      height: 100vh;
+      height: 100dvh;
       background: var(--panel);
       border-left: 1px solid var(--line);
       box-shadow: -18px 0 36px rgba(20, 33, 61, .18);
@@ -1279,6 +1364,62 @@
     }
     .drawer.open {
       transform: translateX(0);
+    }
+    body.drawer-open {
+      overflow: hidden;
+    }
+    .pull-refresh-indicator {
+      position: fixed;
+      left: 50%;
+      top: calc(8px + env(safe-area-inset-top));
+      z-index: 35;
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid rgba(20, 33, 61, .12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .96);
+      color: var(--ink);
+      box-shadow: 0 10px 26px rgba(20, 33, 61, .16);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -52px) scale(.96);
+      transition: transform .16s ease, opacity .16s ease;
+    }
+    .pull-refresh-indicator.visible {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+    .pull-refresh-indicator.refreshing .pull-refresh-icon {
+      animation: pullSpin .8s linear infinite;
+    }
+    .pull-refresh-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      font-size: 20px;
+      line-height: 1;
+    }
+    @keyframes pullSpin {
+      to { transform: rotate(360deg); }
+    }
+    @media (max-width: 760px) {
+      .drawer {
+        left: 0;
+        width: 100vw;
+        max-width: none;
+        border-left: 0;
+        transform: translateX(100%);
+      }
+      .drawer.open {
+        transform: translateX(0);
+      }
     }
     .code-menu-backdrop {
       position: fixed;
@@ -1775,13 +1916,17 @@
           <button id="menuButton" class="menu-button" type="button" aria-label="Menü">☰</button>
         </div>
       </div>
-    </header>
-      <section id="androidInstallPrompt" class="android-install-prompt" hidden>
+	    </header>
+      <div id="productTabs" class="product-tabs" aria-label="Uygulama seç">
+        <button id="vaShiftTab" class="product-tab active" type="button">VA Shift Ass.</button>
+        <button id="nucleusTab" class="product-tab admin-only" type="button">Nucleus</button>
+      </div>
+	      <section id="androidInstallPrompt" class="android-install-prompt" hidden>
         <span>
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.06.04.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.07.07.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <div class="search">
@@ -1818,8 +1963,9 @@
       </div>
     </section>
 
-    <section id="doctorList" class="card"></section>
-    <section id="profileView" class="profile-view card" hidden></section>
+	    <section id="doctorList" class="card"></section>
+	    <section id="nucleusView" class="profile-view nucleus-view card" hidden></section>
+	    <section id="profileView" class="profile-view card" hidden></section>
     <section id="notificationView" class="profile-view card" hidden></section>
     <section id="messageView" class="profile-view card" hidden></section>
     <section id="bicarbView" class="profile-view card" hidden>
@@ -1968,7 +2114,7 @@
       <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.06.04.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.07.07.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -1982,6 +2128,9 @@
     <div id="codeMenuOptions" class="code-menu-options"></div>
   </div>
 
+  <div id="pullRefreshIndicator" class="pull-refresh-indicator" aria-hidden="true">
+    <span class="pull-refresh-icon">↻</span>
+  </div>
   <div id="toastArea" class="toast-area" aria-live="polite" aria-atomic="true"></div>
   <div id="notificationPermissionPrompt" class="notification-permission" hidden>
     <p><strong>Bildirimlere izin ver</strong><br>İcap ve görev değişikliklerinde sistem bildirimi almak için izin ver.</p>
@@ -2020,7 +2169,8 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.06.04";
+    const appVersion = "2026.08.12.02";
+    const nucleusWebViewUrl = "https://vetnucleus.amerikanhastanesi.org:20143/nucleus-mobile/login";
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
@@ -2160,8 +2310,8 @@
       const I = addIcapToRaw;
       return [
         ["Cerrahi","Emine Esma Çerez","60371",["10-16","","8-17","8-17","S","8-17","8-17","10-16","","8-17","8-17","S","8-17","8-17","","",I("8-17"),I("8-17"),I("S"),"","","","","8-17","8-17","S","8-17","8-17","10-16","","8-17"]],
-        ["Cerrahi","Nihan Dikbaş Tsatsaronis","60313",["","12-22",I("A"),I("A"),I("S"),I("A"),I(""),I("A"),I("A"),"8-18","8-18","8-18","","","","","","","","","","","","","","","","","","",""]],
-        ["Cerrahi","Burak Gümürcünler","60455",[I("12-22"),I(""),"S","S","A","S","A","","","12-22","12-22","12-22","","","","","","","","","","","","","","","","","","",""]],
+        ["Cerrahi","Nihan Dikbaş Tsatsaronis","60313",["","12-22",I("A"),I("A"),I("S"),I("A"),I(""),I("A"),I("A"),"8-18","8-18","8-18","8-18","","","12-22","12-22","12-22","12-22","12-22","","","","","","","","","","",""]],
+        ["Cerrahi","Burak Gümürcünler","60455",[I("12-22"),I(""),"S","8-18","A","8-18","12-22","","","A","A","A","A","A","A","","","8-18","8-18","8-18","","","","","","","","","","",""]],
         ["Cerrahi","Yağmur Koçak","60502",["S","","S","S","S","S","S","S","",I("S"),I("S"),I("S"),I("S"),I("S"),I(""),I(""),"S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
         ["Cerrahi","Simge Ayhan","60548",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","","","","","","","","","","","","","","",""]],
         ["Dahiliye","Öykü Sargın","60374",["S","","S","S","S","S","S","S","","","","","","","","",I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),"S"]],
@@ -2170,10 +2320,10 @@
         ["Prof. Asistanı","Özgecan Küleyinoğlu","60314",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
         ["Prof. Asistanı","Sevde İslamoğlu","60380",["","S","S","S","S","S","S","","S","S","S","S","S","","","A","S","S","S","S","S","S","","A","S","S","S","S","S","","S"]],
         ["Genel Muayene","Semih İzmirli","60375",["8-18","20-08","","","","S","S","8-20","20-08","","","8-17","8-17","8-17","8-17","8-17","","","","","","","","","","","","","","",""]],
-        ["Genel Muayene","Hasan Sargın","60420",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","","","","","","","","","","","","","","",""]],
+        ["Genel Muayene","Hasan Sargın","60420",["S","","S","S","S","S","S","S","","S","S","S","S","S","A","","","","","","","","","","","","","","","",""]],
         ["Genel Muayene","Yusuf Sefa Dedeoğlu","60508",["8-18","8-17.30","8-17.30","8-17.30","8-17.30","","","8-18","8-17.30","8-17.30","8-17.30","8-17.30","","","8-18","8-17.30","","","","","","","","","","","","","","",""]],
         ["Genel Muayene","Erhan Gülçiçek","60483",["","A","A","A","A","A","A","","A","A","A","A","A","A","","A","","","","","","","","","","","","","","",""]],
-        ["Genel Muayene","Emre Koçak","60415",["","","8-20","8-20","20-08","","8-20","","","S","S","S","S","S","A","","","","","","","","","","","","","","","",""]],
+        ["Genel Muayene","Emre Koçak","60415",["","","8-20","8-20","20-08","","8-20","","","S","S","S","S","S","S","","","","","","","","","","","","","","","",""]],
         ["Genel Muayene","Tolga Baturalp Tavşanlı","60536",["A","","S","20-08","","S","S","10-22","","S","S","S","S","S","","S","","","","","","","","","","","","","","",""]],
         ["Genel Muayene","Mehmet Yıldız","60400",["8-17","","","","","","","","","","20-08","","8-20","8-20","8-20","","","","","","","","","","","","","","","",""]],
         ["Genel Muayene","Yağmur Kaplan","60382",["20-08","","","20-08","","8-20","8-20","20-08","","","8-20","8-20","20-08","","S","20-08","","","","","","","","","","","","","","",""]],
@@ -2181,7 +2331,7 @@
         ["Genel Muayene","Aysu Altın","60391",["","S","S","8-20","","20-08","","20-08","","8-20","8-20","20-08","","","20-08","","","","","","","","","","","","","","","",""]],
         ["Genel Muayene","Sıla Çınar İzmirli","60430",["8-20","20-08","","","8-20","20-08","","8-20","20-08","","20-08","","","8-20","20-08","","","","","","","","","","","","","","","",""]],
         ["Genel Muayene","Rüzgar Aktaş","60435",["20-08","","20-08","","8-20","8-20","20-08","","","20-08","","8-20","8-20","20-08","","","","","","","","","","","","","","","","",""]],
-        ["Genel Muayene","Görkem Koçak","60488",["","8-20","20-08","","20-08","","20-08","","8-20","20-08","","20-08","","20-08","","8-20","20-08","","20-08","","20-08","","8-20","20-08","","20-08","","20-08","","8-20","20-08"]],
+        ["Genel Muayene","Görkem Koçak","60488",["","8-20","20-08","","20-08","","20-08","","8-20","20-08","","20-08","","20-08","","8-20","","","","","","","","","","","","","","",""]],
         ["Genel Muayene","Begüm Öztürk","60538",["","8-20","S","S","S","S","S","S","","8-20","S","","20-08","","8-20","20-08","","","","","","","","","","","","","","",""]],
         ["Genel Muayene","Melisanur Ural","60448",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
         ["Genel Muayene","Gamze Kartal Mehmedov","60481",["9-17","","9-17","9-17","9-17","9-17","9-17","9-17","","9-17","9-17","9-17","9-17","9-17","9-17","","9-17","9-17","9-17","9-17","9-17","9-17","","9-17","9-17","9-17","9-17","9-17","9-17","","9-17"]],
@@ -2309,12 +2459,13 @@
       "semih izmirli": "6428"
     };
     const doctorUserOverrides = {
-      "60371": "esma",
+      "60371": "esmacerkez",
       "60375": "semihiz",
       "60399": "emrekul",
       "60415": "emringa",
       "60416": "meryemnurt",
       "60420": "hasansar",
+      "60538": "begozturk",
       "TECH-OZLEM-OZCAKIR": "ozlemozcakir",
       "TECH-RECEP-PEKER": "receppe"
     };
@@ -2367,8 +2518,11 @@
       showRegisterButton: document.getElementById("showRegisterButton"),
       createAccountButton: document.getElementById("createAccountButton"),
       showLoginButton: document.getElementById("showLoginButton"),
-      homeButton: document.getElementById("homeButton"),
-      userBadge: document.getElementById("userBadge"),
+	      homeButton: document.getElementById("homeButton"),
+	      productTabs: document.getElementById("productTabs"),
+	      vaShiftTab: document.getElementById("vaShiftTab"),
+	      nucleusTab: document.getElementById("nucleusTab"),
+	      userBadge: document.getElementById("userBadge"),
       search: document.getElementById("searchInput"),
       searchBar: document.querySelector(".search"),
       today: document.getElementById("todayButton"),
@@ -2390,8 +2544,9 @@
       activeShiftLabel: document.getElementById("activeShiftLabel"),
       countLabel: document.getElementById("countLabel"),
       ruleLabel: document.getElementById("ruleLabel"),
-      doctorList: document.getElementById("doctorList"),
-      profileView: document.getElementById("profileView"),
+	      doctorList: document.getElementById("doctorList"),
+	      nucleusView: document.getElementById("nucleusView"),
+	      profileView: document.getElementById("profileView"),
       notificationView: document.getElementById("notificationView"),
       messageView: document.getElementById("messageView"),
       bicarbView: document.getElementById("bicarbView"),
@@ -2436,6 +2591,7 @@
       drawerUserTitle: document.getElementById("drawerUserTitle"),
       drawerClose: document.getElementById("drawerClose"),
       drawerBackdrop: document.getElementById("drawerBackdrop"),
+      pullRefreshIndicator: document.getElementById("pullRefreshIndicator"),
       codeMenu: document.getElementById("codeMenu"),
       codeMenuBackdrop: document.getElementById("codeMenuBackdrop"),
       codeMenuTitle: document.getElementById("codeMenuTitle"),
@@ -2559,6 +2715,18 @@
       return currentUsername() === appUsername;
     }
 
+    function isNativeShell() {
+      return Boolean(window.AndroidPush?.openNucleusInApp) || location.href.startsWith("file:///android_asset/");
+    }
+
+    function syncNativeShellTabs() {
+      const nativeShell = isNativeShell();
+      document.body.classList.toggle("native-shell", nativeShell);
+      if (nativeShell && window.AndroidPush?.setNucleusTabVisible) {
+        window.AndroidPush.setNucleusTabVisible(isAdminUser());
+      }
+    }
+
     function updateUserBadge() {
       const username = currentUsername() || "";
       els.userBadge.innerHTML = `
@@ -2579,6 +2747,16 @@
       els.calciumToolButton.hidden = !isAdminUser();
       els.pushTestMessage.hidden = !isAdminUser();
       els.pushTestButton.hidden = !isAdminUser();
+      els.nucleusTab.hidden = !isAdminUser();
+      syncNativeShellTabs();
+      if (!isAdminUser() && !els.nucleusView.hidden) {
+        closeNucleusView();
+      }
+    }
+
+    function updateProductTabs(active = "shift") {
+      els.vaShiftTab.classList.toggle("active", active === "shift");
+      els.nucleusTab.classList.toggle("active", active === "nucleus");
     }
 
     function appHistoryState(screen = "home", params = {}) {
@@ -2601,7 +2779,8 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
-      closeDrawer();
+      closeNucleusView();
+      closeDrawer({ syncHistory: false });
       closeCodeMenu();
     }
 
@@ -2612,6 +2791,36 @@
         fallback();
       }
     }
+
+    function handleAndroidBack() {
+      if (!els.codeMenu.hidden) {
+        closeCodeMenu();
+        return true;
+      }
+      if (document.body.classList.contains("drawer-open")) {
+        closeDrawer();
+        return true;
+      }
+      const currentScreen = window.history?.state?.vetamerikanShiftApp ? window.history.state.screen : "home";
+      if (currentScreen && currentScreen !== "home") {
+        window.history.back();
+        return true;
+      }
+      const hasOpenScreen = !els.profileView.hidden
+        || !els.notificationView.hidden
+        || !els.messageView.hidden
+        || !els.bicarbView.hidden
+        || !els.calciumView.hidden
+        || !els.nucleusView.hidden;
+      if (hasOpenScreen) {
+        replaceAppHistory("home");
+        goHome();
+        return true;
+      }
+      return false;
+    }
+
+    window.handleAndroidBack = handleAndroidBack;
 
     function applyAppHistoryState(historyState) {
       const target = historyState?.vetamerikanShiftApp ? historyState : appHistoryState("home");
@@ -2631,6 +2840,10 @@
         openBicarbonateTool({ pushHistory: false });
       } else if (target.screen === "calcium") {
         openCalciumTool({ pushHistory: false });
+      } else if (target.screen === "nucleus") {
+        openNucleusView({ pushHistory: false });
+      } else if (target.screen === "drawer") {
+        openDrawer({ pushHistory: false });
       } else {
         render();
       }
@@ -3034,6 +3247,8 @@
       els.app.classList.remove("profile-mode", "notification-mode", "message-mode");
       els.app.classList.remove("bicarb-mode");
       els.app.classList.remove("calcium-mode");
+      els.app.classList.remove("nucleus-mode");
+      updateProductTabs("shift");
       els.profileView.hidden = true;
       els.profileView.innerHTML = "";
       els.notificationView.hidden = true;
@@ -3042,7 +3257,9 @@
       els.messageView.innerHTML = "";
       els.bicarbView.hidden = true;
       els.calciumView.hidden = true;
-      closeDrawer();
+      els.nucleusView.hidden = true;
+      els.nucleusView.innerHTML = "";
+      closeDrawer({ syncHistory: false });
       closeCodeMenu();
       state.day = activeDataset ? Math.min(dayForDataset(activeDataset), activeDays.length) : 1;
       state.shift = "morning";
@@ -3298,6 +3515,51 @@
       els.notificationPermissionPrompt.hidden = true;
     }
 
+    function openNucleusView(options = {}) {
+      if (!isAdminUser()) {
+        goHome();
+        return;
+      }
+      if (options.pushHistory !== false) pushAppHistory("nucleus");
+      closeProfile();
+      closeNotificationCenter();
+      closeMessageCenter();
+      closeBicarbonateTool();
+      closeCalciumTool();
+      closeDrawer();
+      closeCodeMenu();
+      updateProductTabs("nucleus");
+      els.nucleusView.hidden = false;
+      els.app.classList.add("nucleus-mode");
+      if (nucleusWebViewUrl) {
+        els.nucleusView.innerHTML = `
+          <div class="nucleus-placeholder">
+            <div class="nucleus-launch">
+              <h2>Nucleus</h2>
+              <p>Nucleus güvenlik ayarları başka site içinde gömülü açılmasına izin vermiyor. Aşağıdaki düğme aynı ekranda Nucleus sayfasına geçer.</p>
+              <button id="nucleusOpenButton" type="button">Nucleus'u aç</button>
+            </div>
+          </div>
+        `;
+        document.getElementById("nucleusOpenButton").addEventListener("click", () => {
+          if (window.AndroidPush?.openNucleusInApp) {
+            window.AndroidPush.openNucleusInApp(nucleusWebViewUrl);
+            return;
+          }
+          window.open(nucleusWebViewUrl, "_blank", "noopener");
+        });
+      } else {
+        els.nucleusView.innerHTML = `<div class="nucleus-placeholder">Nucleus web adresi bekleniyor.</div>`;
+      }
+    }
+
+    function closeNucleusView() {
+      els.app.classList.remove("nucleus-mode");
+      els.nucleusView.hidden = true;
+      els.nucleusView.innerHTML = "";
+      updateProductTabs("shift");
+    }
+
     function openBicarbonateTool(options = {}) {
       if (!isAdminUser()) return;
       if (options.pushHistory !== false) pushAppHistory("bicarb");
@@ -3305,6 +3567,7 @@
       closeNotificationCenter();
       closeMessageCenter();
       closeCalciumTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
       els.bicarbView.hidden = false;
@@ -3358,6 +3621,7 @@
       closeNotificationCenter();
       closeMessageCenter();
       closeBicarbonateTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
       els.calciumView.hidden = false;
@@ -4531,6 +4795,7 @@
       closeNotificationCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
       els.messageView.hidden = false;
@@ -4780,6 +5045,7 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
       renderNotificationCenter();
@@ -5649,6 +5915,7 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       activeProfileSicil = sicil;
       const entries = profileEntries(row);
       const stats = profileStats(entries);
@@ -5719,6 +5986,7 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       activeProfileSicil = null;
       els.profileView.innerHTML = `
         <div class="profile-head">
@@ -5885,8 +6153,10 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
+      updateProductTabs("shift");
       state.day = activeDataset ? Math.min(dayForDataset(activeDataset), activeDays.length) : 1;
       state.shift = "morning";
       state.query = "";
@@ -5901,16 +6171,127 @@
       render();
     }
 
-    function openDrawer() {
+    function openDrawer(options = {}) {
+      if (options.pushHistory !== false) pushAppHistory("drawer");
       els.drawer.classList.add("open");
       els.drawer.setAttribute("aria-hidden", "false");
       els.drawerBackdrop.hidden = false;
+      document.body.classList.add("drawer-open");
     }
 
-    function closeDrawer() {
+    function closeDrawer(options = {}) {
       els.drawer.classList.remove("open");
       els.drawer.setAttribute("aria-hidden", "true");
       els.drawerBackdrop.hidden = true;
+      document.body.classList.remove("drawer-open");
+      if (
+        options.syncHistory !== false
+        && !isApplyingHistoryState
+        && window.history?.state?.vetamerikanShiftApp
+        && window.history.state.screen === "drawer"
+      ) {
+        replaceAppHistory("home");
+      }
+    }
+
+    function initDrawerSwipeBack() {
+      let startX = 0;
+      let startY = 0;
+      let tracking = false;
+
+      window.addEventListener("touchstart", event => {
+        if (!document.body.classList.contains("drawer-open") || event.touches.length !== 1) return;
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        tracking = true;
+      }, { passive: true });
+
+      window.addEventListener("touchend", event => {
+        if (!tracking) return;
+        tracking = false;
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+        const deltaX = touch.clientX - startX;
+        const deltaY = touch.clientY - startY;
+        if (deltaX < -60 && Math.abs(deltaY) < 80) {
+          goBackOrClose(closeDrawer);
+        }
+      }, { passive: true });
+
+      window.addEventListener("touchcancel", () => {
+        tracking = false;
+      }, { passive: true });
+    }
+
+    function initPullToRefresh() {
+      const indicator = els.pullRefreshIndicator;
+      if (!indicator) return;
+      let startY = 0;
+      let pulling = false;
+      let armed = false;
+      let refreshing = false;
+      const threshold = 86;
+
+      function canPullRefresh(event) {
+        if (refreshing) return false;
+        const scrollTop = window.scrollY
+          || document.documentElement.scrollTop
+          || document.body.scrollTop
+          || 0;
+        if (scrollTop > 2) return false;
+        if (document.body.classList.contains("drawer-open")) return false;
+        if (document.body.classList.contains("message-mode")) return false;
+        if (event.target.closest("input, textarea, select, button, a, .drawer, .code-menu, .message-view, .messages-view, .profile-view:not([hidden])")) return false;
+        return true;
+      }
+
+      function setPullState(distance) {
+        const clamped = Math.max(0, Math.min(distance, 120));
+        armed = clamped >= threshold;
+        indicator.classList.toggle("visible", clamped > 18);
+        indicator.style.transform = `translate(-50%, ${Math.min(clamped / 2, 48)}px) scale(${armed ? 1 : .96})`;
+      }
+
+      function resetPullState() {
+        pulling = false;
+        armed = false;
+        indicator.classList.remove("visible", "refreshing");
+        indicator.style.transform = "";
+      }
+
+      function refreshPage() {
+        refreshing = true;
+        indicator.classList.add("visible", "refreshing");
+        indicator.style.transform = "translate(-50%, 0) scale(1)";
+        const url = new URL(window.location.href);
+        url.searchParams.set("v", `${appVersion}-${Date.now()}`);
+        window.location.replace(url.toString());
+      }
+
+      window.addEventListener("touchstart", event => {
+        if (event.touches.length !== 1 || !canPullRefresh(event)) return;
+        startY = event.touches[0].clientY;
+        pulling = true;
+        armed = false;
+      }, { passive: true });
+
+      window.addEventListener("touchmove", event => {
+        if (!pulling || event.touches.length !== 1) return;
+        const distance = event.touches[0].clientY - startY;
+        if (distance <= 0) return;
+        setPullState(distance);
+      }, { passive: true });
+
+      window.addEventListener("touchend", () => {
+        if (!pulling) return;
+        if (armed) {
+          refreshPage();
+          return;
+        }
+        resetPullState();
+      }, { passive: true });
+
+      window.addEventListener("touchcancel", resetPullState, { passive: true });
     }
 
     function changeDay(delta) {
@@ -6051,14 +6432,16 @@
       els.codeMenuOptions.classList.remove("range-mode");
     }
 
-    document.querySelectorAll(".shift-tabs").forEach(tabGroup => {
-      tabGroup.addEventListener("click", selectShiftFromEvent);
+	    document.querySelectorAll(".shift-tabs").forEach(tabGroup => {
+	      tabGroup.addEventListener("click", selectShiftFromEvent);
       tabGroup.addEventListener("touchend", event => {
         event.preventDefault();
         selectShiftFromEvent(event);
-      }, { passive: false });
-    });
-    replaceAppHistory("home");
+	      }, { passive: false });
+	    });
+    els.vaShiftTab.addEventListener("click", goHome);
+    els.nucleusTab.addEventListener("click", openNucleusView);
+	    replaceAppHistory("home");
     window.addEventListener("popstate", event => {
       applyAppHistoryState(event.state);
     });
@@ -6214,6 +6597,8 @@
     renderMessageBadge();
     updateNotificationStatus();
     updateAndroidInstallPrompt();
+    initDrawerSwipeBack();
+    initPullToRefresh();
     checkForAppUpdate();
     render();
     initAuth();
