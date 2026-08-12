@@ -3526,7 +3526,11 @@
           </div>
         `;
         document.getElementById("nucleusOpenButton").addEventListener("click", () => {
-          window.location.href = nucleusWebViewUrl;
+          if (window.AndroidPush?.openNucleusInApp) {
+            window.AndroidPush.openNucleusInApp(nucleusWebViewUrl);
+            return;
+          }
+          window.open(nucleusWebViewUrl, "_blank", "noopener");
         });
       } else {
         els.nucleusView.innerHTML = `<div class="nucleus-placeholder">Nucleus web adresi bekleniyor.</div>`;
