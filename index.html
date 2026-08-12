@@ -166,6 +166,31 @@
       border-bottom: 1px solid var(--line);
       backdrop-filter: blur(14px);
     }
+    .product-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+    .product-tabs[hidden] {
+      display: none !important;
+    }
+    .product-tab {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0;
+      box-shadow: 0 8px 22px rgba(20, 33, 61, .06);
+    }
+    .product-tab.active {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+    }
     .brand {
       display: grid;
       gap: 10px;
@@ -652,7 +677,13 @@
     .app.calcium-mode .summary,
     .app.calcium-mode .search,
     .app.calcium-mode .day-strip,
-    .app.calcium-mode #doctorList {
+    .app.calcium-mode #doctorList,
+    .app.nucleus-mode .shift-tabs,
+    .app.nucleus-mode .summary,
+    .app.nucleus-mode .search,
+    .app.nucleus-mode .day-strip,
+    .app.nucleus-mode #doctorList,
+    .app.nucleus-mode #androidInstallPrompt {
       display: none;
     }
     .profile-view {
@@ -664,6 +695,55 @@
       display: grid;
       align-content: start;
       gap: 14px;
+    }
+    .nucleus-view {
+      min-height: min(720px, calc(100svh - 190px));
+      overflow: hidden;
+      padding: 0;
+    }
+    .nucleus-placeholder {
+      min-height: min(520px, calc(100svh - 220px));
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+    .nucleus-launch {
+      display: grid;
+      gap: 14px;
+      max-width: 420px;
+      width: 100%;
+    }
+    .nucleus-launch h2,
+    .nucleus-launch p {
+      margin: 0;
+    }
+    .nucleus-launch h2 {
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1.15;
+    }
+    .nucleus-launch p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .nucleus-launch button,
+    .nucleus-launch a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--brand);
+      border-radius: 8px;
+      background: var(--brand);
+      color: #fff;
+      padding: 0 14px;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: none;
     }
     #messageView.message-thread-view {
       display: flex;
@@ -1833,8 +1913,12 @@
           <button id="menuButton" class="menu-button" type="button" aria-label="Menü">☰</button>
         </div>
       </div>
-    </header>
-      <section id="androidInstallPrompt" class="android-install-prompt" hidden>
+	    </header>
+      <div id="productTabs" class="product-tabs" aria-label="Uygulama seç">
+        <button id="vaShiftTab" class="product-tab active" type="button">VA Shift Ass.</button>
+        <button id="nucleusTab" class="product-tab admin-only" type="button">Nucleus</button>
+      </div>
+	      <section id="androidInstallPrompt" class="android-install-prompt" hidden>
         <span>
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
@@ -1876,8 +1960,9 @@
       </div>
     </section>
 
-    <section id="doctorList" class="card"></section>
-    <section id="profileView" class="profile-view card" hidden></section>
+	    <section id="doctorList" class="card"></section>
+	    <section id="nucleusView" class="profile-view nucleus-view card" hidden></section>
+	    <section id="profileView" class="profile-view card" hidden></section>
     <section id="notificationView" class="profile-view card" hidden></section>
     <section id="messageView" class="profile-view card" hidden></section>
     <section id="bicarbView" class="profile-view card" hidden>
@@ -2082,6 +2167,7 @@
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
     const appVersion = "2026.08.07.07";
+    const nucleusWebViewUrl = "https://vetnucleus.amerikanhastanesi.org:20143/nucleus-mobile/login";
     const appUpdateManifestUrls = [
       "app-update.json",
       "https://vetmaster.github.io/Vetmaster-vetamerikan-shift-asistan_3.0/app-update.json",
@@ -2370,12 +2456,13 @@
       "semih izmirli": "6428"
     };
     const doctorUserOverrides = {
-      "60371": "esma",
+      "60371": "esmacerkez",
       "60375": "semihiz",
       "60399": "emrekul",
       "60415": "emringa",
       "60416": "meryemnurt",
       "60420": "hasansar",
+      "60538": "begozturk",
       "TECH-OZLEM-OZCAKIR": "ozlemozcakir",
       "TECH-RECEP-PEKER": "receppe"
     };
@@ -2428,8 +2515,11 @@
       showRegisterButton: document.getElementById("showRegisterButton"),
       createAccountButton: document.getElementById("createAccountButton"),
       showLoginButton: document.getElementById("showLoginButton"),
-      homeButton: document.getElementById("homeButton"),
-      userBadge: document.getElementById("userBadge"),
+	      homeButton: document.getElementById("homeButton"),
+	      productTabs: document.getElementById("productTabs"),
+	      vaShiftTab: document.getElementById("vaShiftTab"),
+	      nucleusTab: document.getElementById("nucleusTab"),
+	      userBadge: document.getElementById("userBadge"),
       search: document.getElementById("searchInput"),
       searchBar: document.querySelector(".search"),
       today: document.getElementById("todayButton"),
@@ -2451,8 +2541,9 @@
       activeShiftLabel: document.getElementById("activeShiftLabel"),
       countLabel: document.getElementById("countLabel"),
       ruleLabel: document.getElementById("ruleLabel"),
-      doctorList: document.getElementById("doctorList"),
-      profileView: document.getElementById("profileView"),
+	      doctorList: document.getElementById("doctorList"),
+	      nucleusView: document.getElementById("nucleusView"),
+	      profileView: document.getElementById("profileView"),
       notificationView: document.getElementById("notificationView"),
       messageView: document.getElementById("messageView"),
       bicarbView: document.getElementById("bicarbView"),
@@ -2641,6 +2732,15 @@
       els.calciumToolButton.hidden = !isAdminUser();
       els.pushTestMessage.hidden = !isAdminUser();
       els.pushTestButton.hidden = !isAdminUser();
+      els.nucleusTab.hidden = !isAdminUser();
+      if (!isAdminUser() && !els.nucleusView.hidden) {
+        closeNucleusView();
+      }
+    }
+
+    function updateProductTabs(active = "shift") {
+      els.vaShiftTab.classList.toggle("active", active === "shift");
+      els.nucleusTab.classList.toggle("active", active === "nucleus");
     }
 
     function appHistoryState(screen = "home", params = {}) {
@@ -2663,6 +2763,7 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       closeDrawer({ syncHistory: false });
       closeCodeMenu();
     }
@@ -2693,7 +2794,8 @@
         || !els.notificationView.hidden
         || !els.messageView.hidden
         || !els.bicarbView.hidden
-        || !els.calciumView.hidden;
+        || !els.calciumView.hidden
+        || !els.nucleusView.hidden;
       if (hasOpenScreen) {
         replaceAppHistory("home");
         goHome();
@@ -2722,6 +2824,8 @@
         openBicarbonateTool({ pushHistory: false });
       } else if (target.screen === "calcium") {
         openCalciumTool({ pushHistory: false });
+      } else if (target.screen === "nucleus") {
+        openNucleusView({ pushHistory: false });
       } else if (target.screen === "drawer") {
         openDrawer({ pushHistory: false });
       } else {
@@ -3127,6 +3231,8 @@
       els.app.classList.remove("profile-mode", "notification-mode", "message-mode");
       els.app.classList.remove("bicarb-mode");
       els.app.classList.remove("calcium-mode");
+      els.app.classList.remove("nucleus-mode");
+      updateProductTabs("shift");
       els.profileView.hidden = true;
       els.profileView.innerHTML = "";
       els.notificationView.hidden = true;
@@ -3135,6 +3241,8 @@
       els.messageView.innerHTML = "";
       els.bicarbView.hidden = true;
       els.calciumView.hidden = true;
+      els.nucleusView.hidden = true;
+      els.nucleusView.innerHTML = "";
       closeDrawer({ syncHistory: false });
       closeCodeMenu();
       state.day = activeDataset ? Math.min(dayForDataset(activeDataset), activeDays.length) : 1;
@@ -3391,6 +3499,47 @@
       els.notificationPermissionPrompt.hidden = true;
     }
 
+    function openNucleusView(options = {}) {
+      if (!isAdminUser()) {
+        goHome();
+        return;
+      }
+      if (options.pushHistory !== false) pushAppHistory("nucleus");
+      closeProfile();
+      closeNotificationCenter();
+      closeMessageCenter();
+      closeBicarbonateTool();
+      closeCalciumTool();
+      closeDrawer();
+      closeCodeMenu();
+      updateProductTabs("nucleus");
+      els.nucleusView.hidden = false;
+      els.app.classList.add("nucleus-mode");
+      if (nucleusWebViewUrl) {
+        els.nucleusView.innerHTML = `
+          <div class="nucleus-placeholder">
+            <div class="nucleus-launch">
+              <h2>Nucleus</h2>
+              <p>Nucleus güvenlik ayarları başka site içinde gömülü açılmasına izin vermiyor. Aşağıdaki düğme aynı ekranda Nucleus sayfasına geçer.</p>
+              <button id="nucleusOpenButton" type="button">Nucleus'u aç</button>
+            </div>
+          </div>
+        `;
+        document.getElementById("nucleusOpenButton").addEventListener("click", () => {
+          window.location.href = nucleusWebViewUrl;
+        });
+      } else {
+        els.nucleusView.innerHTML = `<div class="nucleus-placeholder">Nucleus web adresi bekleniyor.</div>`;
+      }
+    }
+
+    function closeNucleusView() {
+      els.app.classList.remove("nucleus-mode");
+      els.nucleusView.hidden = true;
+      els.nucleusView.innerHTML = "";
+      updateProductTabs("shift");
+    }
+
     function openBicarbonateTool(options = {}) {
       if (!isAdminUser()) return;
       if (options.pushHistory !== false) pushAppHistory("bicarb");
@@ -3398,6 +3547,7 @@
       closeNotificationCenter();
       closeMessageCenter();
       closeCalciumTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
       els.bicarbView.hidden = false;
@@ -3451,6 +3601,7 @@
       closeNotificationCenter();
       closeMessageCenter();
       closeBicarbonateTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
       els.calciumView.hidden = false;
@@ -4624,6 +4775,7 @@
       closeNotificationCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
       els.messageView.hidden = false;
@@ -4873,6 +5025,7 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
       renderNotificationCenter();
@@ -5742,6 +5895,7 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       activeProfileSicil = sicil;
       const entries = profileEntries(row);
       const stats = profileStats(entries);
@@ -5812,6 +5966,7 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       activeProfileSicil = null;
       els.profileView.innerHTML = `
         <div class="profile-head">
@@ -5978,8 +6133,10 @@
       closeMessageCenter();
       closeBicarbonateTool();
       closeCalciumTool();
+      closeNucleusView();
       closeDrawer();
       closeCodeMenu();
+      updateProductTabs("shift");
       state.day = activeDataset ? Math.min(dayForDataset(activeDataset), activeDays.length) : 1;
       state.shift = "morning";
       state.query = "";
@@ -6255,14 +6412,16 @@
       els.codeMenuOptions.classList.remove("range-mode");
     }
 
-    document.querySelectorAll(".shift-tabs").forEach(tabGroup => {
-      tabGroup.addEventListener("click", selectShiftFromEvent);
+	    document.querySelectorAll(".shift-tabs").forEach(tabGroup => {
+	      tabGroup.addEventListener("click", selectShiftFromEvent);
       tabGroup.addEventListener("touchend", event => {
         event.preventDefault();
         selectShiftFromEvent(event);
-      }, { passive: false });
-    });
-    replaceAppHistory("home");
+	      }, { passive: false });
+	    });
+    els.vaShiftTab.addEventListener("click", goHome);
+    els.nucleusTab.addEventListener("click", openNucleusView);
+	    replaceAppHistory("home");
     window.addEventListener("popstate", event => {
       applyAppHistoryState(event.state);
     });
