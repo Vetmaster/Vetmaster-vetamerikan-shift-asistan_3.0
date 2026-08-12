@@ -175,6 +175,9 @@
     .product-tabs[hidden] {
       display: none !important;
     }
+    body.native-shell .product-tabs {
+      display: none !important;
+    }
     .product-tab {
       min-height: 42px;
       border: 1px solid var(--line);
@@ -2166,7 +2169,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.07.07";
+    const appVersion = "2026.08.12.02";
     const nucleusWebViewUrl = "https://vetnucleus.amerikanhastanesi.org:20143/nucleus-mobile/login";
     const appUpdateManifestUrls = [
       "app-update.json",
@@ -2712,6 +2715,18 @@
       return currentUsername() === appUsername;
     }
 
+    function isNativeShell() {
+      return Boolean(window.AndroidPush?.openNucleusInApp) || location.href.startsWith("file:///android_asset/");
+    }
+
+    function syncNativeShellTabs() {
+      const nativeShell = isNativeShell();
+      document.body.classList.toggle("native-shell", nativeShell);
+      if (nativeShell && window.AndroidPush?.setNucleusTabVisible) {
+        window.AndroidPush.setNucleusTabVisible(isAdminUser());
+      }
+    }
+
     function updateUserBadge() {
       const username = currentUsername() || "";
       els.userBadge.innerHTML = `
@@ -2733,6 +2748,7 @@
       els.pushTestMessage.hidden = !isAdminUser();
       els.pushTestButton.hidden = !isAdminUser();
       els.nucleusTab.hidden = !isAdminUser();
+      syncNativeShellTabs();
       if (!isAdminUser() && !els.nucleusView.hidden) {
         closeNucleusView();
       }
