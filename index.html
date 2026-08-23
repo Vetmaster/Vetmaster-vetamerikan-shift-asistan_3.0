@@ -344,6 +344,17 @@
       gap: 8px;
       margin-bottom: 10px;
     }
+    .shift-update-meta {
+      margin: -2px 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+    .shift-update-meta strong {
+      color: var(--ink);
+      font-weight: 900;
+    }
     .search input, .search button, .day, .shift-tab {
       min-height: 44px;
       border: 1px solid var(--line);
@@ -1592,6 +1603,25 @@
     .import-body .push-test-message {
       min-height: 58px;
     }
+    .role-preview-control {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid rgba(183, 150, 204, 0.45);
+      border-radius: 8px;
+      background: rgba(183, 150, 204, 0.12);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .role-preview-control[hidden] {
+      display: none !important;
+    }
+    .role-preview-control select {
+      margin-top: 2px;
+      background: #fff;
+      color: var(--ink);
+    }
     .import-body button {
       background: #b796cc;
       border-color: #b796cc;
@@ -1926,13 +1956,14 @@
           <strong id="androidInstallTitle">Android uygulaması hazır</strong>
           <small id="androidInstallText">Web yerine telefonuna APK olarak kurabilirsin.</small>
         </span>
-        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.20.01.apk" download>Uygulamayı kur</a>
+        <a id="androidInstallLink" href="Vetamerikan-Shift-Asistan-2026.08.21.01.apk" download>Uygulamayı kur</a>
         <button id="androidInstallDismiss" type="button">Daha sonra</button>
       </section>
       <div class="search">
         <input id="searchInput" type="search" placeholder="Hekim ara" autocomplete="off">
         <button id="todayButton" type="button">Bugün</button>
       </div>
+      <div id="shiftUpdateMeta" class="shift-update-meta"></div>
       <div id="dayStrip" class="day-strip" aria-label="Gün seç"></div>
 
     <div id="shiftTabs" class="shift-tabs" aria-label="Vardiya seç">
@@ -2097,6 +2128,14 @@
       <button id="drawerClose" class="drawer-close" type="button" aria-label="Kapat">×</button>
     </div>
     <div class="import-body">
+      <label id="rolePreviewControl" class="role-preview-control" hidden>
+        Ekranı rol olarak gör
+        <select id="rolePreviewSelect">
+          <option value="superadmin">Süper admin</option>
+          <option value="admin">Admin</option>
+          <option value="user">Normal kullanıcı</option>
+        </select>
+      </label>
       <div id="excelDatabaseTools" class="admin-only">
         <input id="excelFile" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
         <button id="excelImportButton" type="button">Excel yükle ve database oluştur</button>
@@ -2110,11 +2149,11 @@
         </div>
       </details>
       <div id="pushStatus" class="import-status">Push durumu: kontrol edilmedi.</div>
-      <textarea id="pushTestMessage" class="admin-only push-test-message" rows="2" placeholder="Gönderilecek push mesajı"></textarea>
-      <button id="pushTestButton" class="admin-only" type="button">Toplu bildirim gönder</button>
+      <textarea id="pushTestMessage" class="admin-only push-test-message" rows="2" placeholder="Gönderilecek push mesajı" hidden></textarea>
+      <button id="pushTestButton" class="admin-only" type="button" hidden>Toplu bildirim gönder</button>
       <div id="notificationStatus" class="import-status" hidden></div>
       <div id="appVersionLabel" class="import-status" hidden></div>
-      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.20.01.apk" download hidden>Android uygulamasını kur</a>
+      <a id="drawerAndroidInstallLink" class="drawer-install-link" href="Vetamerikan-Shift-Asistan-2026.08.21.01.apk" download hidden>Android uygulamasını kur</a>
       <button id="logoutButton" type="button">Çıkış yap</button>
     </div>
   </aside>
@@ -2144,10 +2183,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const appUsername = "admin";
+    const superAdminUsername = appUsername;
+    const adminUsernames = new Set([superAdminUsername, "semihiz"]);
     const authStorageKey = "vetamerikan-shift-authenticated";
     const authUserStorageKey = "vetamerikan-shift-auth-user";
     const authUserCreatedAtStorageKey = "vetamerikan-shift-auth-user-created-at";
     const authUserNotificationStartStorageKey = "vetamerikan-shift-auth-user-notification-start-at";
+    const rolePreviewStorageKey = "vetamerikan-shift-role-preview";
     const authUsersStorageKey = "vetamerikan-shift-users";
     const notificationStorageKey = "vetamerikan-shift-notifications-enabled";
     const notificationListStorageKey = "vetamerikan-shift-notification-list";
@@ -2169,7 +2211,7 @@
     const webPushSubscriptionTable = "shift_web_push_subscriptions";
     const pushFunctionName = "send-push-notification";
     const webPushPublicKey = "BKdWhyySJUJNEq_ovy9NajYLUQvE1xvfj5Mlx-UAPEftIS1BaDeVgDIAh2840QZKU6w9-W9O7-u7RSOntwIy1q0";
-    const appVersion = "2026.08.20.01";
+    const appVersion = "2026.08.21.01";
     const nucleusWebViewUrl = "https://vetnucleus.amerikanhastanesi.org:20143/nucleus-mobile/login";
     const appUpdateManifestUrls = [
       "app-update.json",
@@ -2311,30 +2353,30 @@
       return [
         ["Cerrahi","Emine Esma Çerez","60371",["10-16","","8-17","8-17","S","8-17","8-17","10-16","","8-17","8-17","S","8-17","8-17","","",I("8-17"),I("8-17"),I("S"),"","","","","8-17","8-17","S","8-17","8-17","10-16","","8-17"]],
         ["Cerrahi","Nihan Dikbaş Tsatsaronis","60313",["","12-22",I("A"),I("A"),I("S"),I("A"),I(""),I("A"),I("A"),"8-18","8-18","8-18","8-18","","","8-18","12-22","12-22","12-22","8-18","","","","","","","","","","",""]],
-        ["Cerrahi","Burak Gümürcünler","60455",[I("12-22"),I(""),"S","8-18","A","8-18","12-22","","","A","A","A","A","A","A","","","8-18","8-18","12-22","12-22","12-22","","A","A","A","A","A","A","","A"]],
-        ["Cerrahi","Yağmur Koçak","60502",["S","","S","S","S","S","S","S","",I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),"S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
-        ["Cerrahi","Simge Ayhan","60548",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","","S","S","S","S","","S","S","S","S","S","S","","S","S"]],
+        ["Cerrahi","Burak Gümürcünler","60455",[I("12-22"),I(""),"S","8-18","A","8-18","12-22","","","A","A","A","A","A","A","","","8-18","8-18","12-22","12-22","12-22",I(""),I("A"),I("A"),I("A"),I("A"),I("A"),I("A"),I(""),I("A")]],
+        ["Cerrahi","Yağmur Koçak","60502",["S","","S","S","S","S","S","S","",I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),"S","S","S","S","S","S","","S","S","S","S","S","S","",""]],
+        ["Cerrahi","Simge Ayhan","60548",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","","S","S","S","S","","S","S","S","S","S","S","","A","S"]],
         ["Cerrahi","Saniye Kayacık","60550",["","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","","","S","S","S","S","S","S","","S"]],
         ["Dahiliye","Öykü Sargın","60374",["S","","S","S","S","S","S","S","","","","","","","","",I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),"S"]],
         ["Dahiliye","Emre Külük","60399",[I(""),I("S"),I("12-22"),I("10-20"),I("12-22"),I("10-20"),I("12-22"),I(""),I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I("S"),I(""),"12-22","10-20","12-22","10-20","12-22","12-22","","","","","","","","","12-22"]],
         ["Dahiliye","Efrahim Sargın","60373",["S","","S","S","S","S","S","S","","","","","","","","","S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
         ["Prof. Asistanı","Özgecan Küleyinoğlu","60314",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
         ["Prof. Asistanı","Sevde İslamoğlu","60380",["","S","S","S","S","S","S","","S","S","S","S","S","","","A","S","S","S","S","S","","A","S","S","S","S","S","","S","S"]],
-        ["Genel Muayene","Semih İzmirli","60375",["8-18","20-08","","","","S","S","8-20","20-08","","","8-17","8-17","8-17","8-17","8-17","8-17","Eğitim","DG","","8-17","8-17","20-08","","","","","","","",""]],
+        ["Genel Muayene","Semih İzmirli","60375",["8-18","20-08","","","","S","S","8-20","20-08","","","8-17","8-17","8-17","8-17","8-17","8-17","Eğitim","DG","","8-17","8-17","20-08","","8-17","","8-17","8-17","8-17","20-08",""]],
         ["Genel Muayene","Hasan Sargın","60420",["S","","S","S","S","S","S","S","","S","S","S","S","S","A","","S","S","S","S","S","S","","","","","","","","",""]],
         ["Genel Muayene","Yusuf Sefa Dedeoğlu","60508",["8-18","8-17.30","8-17.30","8-17.30","8-17.30","","","8-18","8-17.30","8-17.30","8-17.30","8-17.30","8-17.30","","8-18","8-17.30","8-17.30","8-17.30","8-17.30","","","8-18","8-17.30","","","","","","","",""]],
         ["Genel Muayene","Erhan Gülçiçek","60483",["","A","A","A","A","A","A","","A","A","A","A","A","A","","A","A","A","","A","20-08","","A","","","","","","","",""]],
-        ["Genel Muayene","Emre Koçak","60415",["","","8-20","8-20","20-08","","8-20","","","S","S","S","S","S","S","","S","S","S","S","","","","","","","","","","",""]],
-        ["Genel Muayene","Tolga Baturalp Tavşanlı","60536",["A","","S","20-08","","S","S","10-22","","S","S","S","S","RAPOR","RAPOR","RAPOR","S","S","8-20","20-08","","","S","","","","","","","",""]],
-        ["Genel Muayene","Mehmet Yıldız","60400",["8-17","","","","","","","","","","20-08","","8-20","8-20","8-20","","8-17","8-17","20-08","","8-17","8-17","","","","","","","","",""]],
+        ["Genel Muayene","Emre Koçak","60415",["","","8-20","8-20","20-08","","8-20","","","S","S","S","S","S","S","","S","S","S","S","","","","S","S","11-19","","8-20","20-08","",""]],
+        ["Genel Muayene","Tolga Baturalp Tavşanlı","60536",["A","","S","20-08","","S","S","10-22","","S","S","S","S","RAPOR","RAPOR","RAPOR","RAPOR","RAPOR","8-20","20-08","","","S","","","","","","","",""]],
+        ["Genel Muayene","Mehmet Yıldız","60400",["8-17","","","","","","","","","","20-08","","8-20","8-20","8-20","","8-17","8-17","20-08","","8-17","8-17","","S","20-08","","8-20","S","S","",""]],
         ["Genel Muayene","Yağmur Kaplan","60382",["20-08","","","20-08","","8-20","8-20","20-08","","S","8-20","8-20","20-08","","","20-08","","8-20","8-20","20-08","","","","","","","","","","",""]],
-        ["Genel Muayene","Meryemnur Tecimer","60416",["A","A","15-22","15-22","","15-22","15-22","15-22","8-20","15-22","15-22","15-22","","RAPOR","RAPOR","RAPOR","15-22","15-22","15-22","15-22","","15-22","8-20","","","","","","","",""]],
+        ["Genel Muayene","Meryemnur Tecimer","60416",["A","A","15-22","15-22","","15-22","15-22","15-22","8-20","15-22","15-22","15-22","","RAPOR","RAPOR","RAPOR","15-22","15-22","15-22","15-22","","15-22","8-20","","","8-20","A","A","A","8-20",""]],
         ["Genel Muayene","Aysu Altın","60391",["","S","S","8-20","","20-08","","20-08","","8-20","8-20","20-08","","","20-08","","","20-08","","8-20","8-20","20-08","","","","","","","", "", ""]],
-        ["Genel Muayene","Sıla Çınar İzmirli","60430",["8-20","20-08","","","8-20","20-08","","8-20","20-08","","20-08","","","8-20","20-08","","8-20","","","","8-20","20-08","","","","","","","","",""]],
-        ["Genel Muayene","Rüzgar Aktaş","60435",["20-08","","20-08","","8-20","8-20","20-08","","","20-08","","8-20","8-20","20-08","","","20-08","","S","S","","8-20","20-08","","","","","","","",""]],
-        ["Genel Muayene","Görkem Koçak","60488",["","8-20","20-08","","20-08","","20-08","","8-20","20-08","","20-08","","20-08","","8-20","20-08","","20-08","","20-08","","8-20","","","","","","","",""]],
+        ["Genel Muayene","Sıla Çınar İzmirli","60430",["8-20","20-08","","","8-20","20-08","","8-20","20-08","","20-08","","","8-20","20-08","","8-20","","","","8-20","20-08","","8-20","8-20","","20-08","","8-20","20-08",""]],
+        ["Genel Muayene","Rüzgar Aktaş","60435",["20-08","","20-08","","8-20","8-20","20-08","","","20-08","","8-20","8-20","20-08","","","20-08","","S","S","","8-20","20-08","","8-20","20-08","","","20-08","",""]],
+        ["Genel Muayene","Görkem Koçak","60488",["","8-20","20-08","","20-08","","20-08","","8-20","20-08","","20-08","","20-08","","8-20","20-08","","20-08","","20-08","","8-20","8-20","20-08","","20-08","","8-20","",""]],
         ["Genel Muayene","Begüm Öztürk","60538",["","","S","S","S","S","S","S","","8-20","S","","20-08","","8-20","20-08","","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
-        ["Genel Muayene","Melisanur Ural","60448",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S"]],
+        ["Genel Muayene","Melisanur Ural","60448",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","","","","","","","","S"]],
         ["Genel Muayene","Gamze Kartal Mehmedov","60481",["9-17","","9-17","9-17","9-17","9-17","9-17","9-17","","9-17","9-17","9-17","9-17","9-17","9-17","","9-17","9-17","9-17","9-17","9-17","9-17","","9-17","9-17","9-17","9-17","9-17","9-17","","9-17"]],
         ["Genel Muayene","Mehmet Kızıloğlu","60501",["S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S","S","S","S","S","S","","S"]]
       ];
@@ -2368,6 +2410,7 @@
       label: "Haziran 2026",
       year: 2026,
       monthIndex: 5,
+      lastUpdatedAt: "2026-06-03T17:39:25+03:00",
       rows
     };
     const julyDataset = {
@@ -2375,6 +2418,7 @@
       label: "Temmuz 2026",
       year: 2026,
       monthIndex: 6,
+      lastUpdatedAt: "2026-07-05T00:00:00+03:00",
       rows: julyRows2026Updated
     };
     const augustDataset = {
@@ -2382,6 +2426,7 @@
       label: "Ağustos 2026",
       year: 2026,
       monthIndex: 7,
+      lastUpdatedAt: "2026-08-22T12:13:22+03:00",
       rows: augustRows2026
     };
     let activeDataset = builtInDataset;
@@ -2468,6 +2513,7 @@
       "60415": "emringa",
       "60416": "meryemnurt",
       "60420": "hasansar",
+      "60548": "simgea",
       "60538": "begozturk",
       "TECH-OZLEM-OZCAKIR": "ozlemozcakir",
       "TECH-RECEP-PEKER": "receppe"
@@ -2528,6 +2574,7 @@
 	      userBadge: document.getElementById("userBadge"),
       search: document.getElementById("searchInput"),
       searchBar: document.querySelector(".search"),
+      shiftUpdateMeta: document.getElementById("shiftUpdateMeta"),
       today: document.getElementById("todayButton"),
       dayStrip: document.getElementById("dayStrip"),
       tabGroups: Array.from(document.querySelectorAll(".shift-tabs")),
@@ -2567,6 +2614,8 @@
       excelDatabaseTools: document.getElementById("excelDatabaseTools"),
       excelFile: document.getElementById("excelFile"),
       excelImportButton: document.getElementById("excelImportButton"),
+      rolePreviewControl: document.getElementById("rolePreviewControl"),
+      rolePreviewSelect: document.getElementById("rolePreviewSelect"),
       calculationToolsAccordion: document.getElementById("calculationToolsAccordion"),
       bicarbToolButton: document.getElementById("bicarbToolButton"),
       calciumToolButton: document.getElementById("calciumToolButton"),
@@ -2714,8 +2763,19 @@
       return localStorage.getItem(`${authUserNotificationStartStorageKey}:${username}`) || currentUserCreatedAt();
     }
 
+    function isSuperAdminUser() {
+      return currentUsername() === superAdminUsername;
+    }
+
+    function effectiveRole() {
+      if (!isSuperAdminUser()) return adminUsernames.has(currentUsername()) ? "admin" : "user";
+      const previewRole = localStorage.getItem(rolePreviewStorageKey);
+      return ["superadmin", "admin", "user"].includes(previewRole) ? previewRole : "superadmin";
+    }
+
     function isAdminUser() {
-      return currentUsername() === appUsername;
+      const role = effectiveRole();
+      return role === "superadmin" || role === "admin";
     }
 
     function isNativeShell() {
@@ -2744,12 +2804,15 @@
     }
 
     function updateAdminVisibility() {
+      const role = effectiveRole();
+      els.rolePreviewControl.hidden = !isSuperAdminUser();
+      els.rolePreviewSelect.value = role;
       els.excelDatabaseTools.hidden = !isAdminUser();
       els.calculationToolsAccordion.hidden = !isAdminUser();
       els.bicarbToolButton.hidden = !isAdminUser();
       els.calciumToolButton.hidden = !isAdminUser();
-      els.pushTestMessage.hidden = !isAdminUser();
-      els.pushTestButton.hidden = !isAdminUser();
+      els.pushTestMessage.hidden = true;
+      els.pushTestButton.hidden = true;
       els.nucleusTab.hidden = !isAdminUser();
       syncNativeShellTabs();
       if (!isAdminUser() && !els.nucleusView.hidden) {
@@ -3293,6 +3356,7 @@
       resetToHomeView();
       replaceAppHistory("home");
       if (supabaseClient) await supabaseClient.auth.signOut({ scope: "local" });
+      localStorage.removeItem(rolePreviewStorageKey);
       clearAuth();
       updateUserBadge();
       updateAdminVisibility();
@@ -5519,6 +5583,21 @@
       return `${monthName.charAt(0).toLocaleUpperCase("tr-TR")}${monthName.slice(1)} ${year}`;
     }
 
+    function formatDatasetLastUpdated(dataset) {
+      if (!dataset) return "Belirtilmedi";
+      if (dataset.lastUpdatedAt) {
+        const date = new Date(dataset.lastUpdatedAt);
+        if (!Number.isNaN(date.getTime())) {
+          return date.toLocaleDateString("tr-TR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          });
+        }
+      }
+      return dataset.lastUpdated || "Belirtilmedi";
+    }
+
     function dateValueForDay(day) {
       const month = String(activeDataset.monthIndex + 1).padStart(2, "0");
       const date = String(day).padStart(2, "0");
@@ -5690,6 +5769,7 @@
         label,
         year: monthInfo.year,
         monthIndex: monthInfo.monthIndex,
+        lastUpdatedAt: new Date().toISOString(),
         rows: parsedRows
       };
     }
@@ -6079,6 +6159,17 @@
       els.infectionTabCount.textContent = `${rowsForShift("ENFEKSIYON", "").length} kişi`;
     }
 
+    function renderShiftUpdateMeta() {
+      if (!activeDataset) {
+        els.shiftUpdateMeta.hidden = true;
+        els.shiftUpdateMeta.textContent = "";
+        return;
+      }
+      const updated = formatDatasetLastUpdated(activeDataset);
+      els.shiftUpdateMeta.hidden = false;
+      els.shiftUpdateMeta.innerHTML = `Son şift güncelleme tarihi: <strong>${escapeHtml(updated)}</strong>`;
+    }
+
     function renderList() {
       if (!activeDataset) {
         renderMissingCurrentMonth();
@@ -6134,8 +6225,10 @@
       }
       els.searchBar.hidden = false;
       els.dayStrip.hidden = false;
+      els.shiftUpdateMeta.hidden = false;
       els.tabGroups.forEach(group => group.hidden = false);
       els.summaryCard.hidden = false;
+      renderShiftUpdateMeta();
       renderDays();
       renderTabs();
       renderList();
@@ -6145,6 +6238,7 @@
     function renderMissingCurrentMonth() {
       els.searchBar.hidden = true;
       els.dayStrip.hidden = true;
+      els.shiftUpdateMeta.hidden = true;
       els.tabGroups.forEach(group => group.hidden = true);
       els.summaryCard.hidden = true;
       els.doctorList.innerHTML = `<div class="empty">Henüz mevcut ayın shift listesi yayınlanmamıştır.</div>`;
@@ -6511,6 +6605,13 @@
     els.androidInstallDismiss.addEventListener("click", dismissAndroidInstallPrompt);
     els.pushTestButton.addEventListener("click", sendPushTestNotification);
     els.excelImportButton.addEventListener("click", importExcelFile);
+    els.rolePreviewSelect.addEventListener("change", () => {
+      if (!isSuperAdminUser()) return;
+      localStorage.setItem(rolePreviewStorageKey, els.rolePreviewSelect.value);
+      updateAdminVisibility();
+      const selectedRoleLabel = els.rolePreviewSelect.options[els.rolePreviewSelect.selectedIndex].textContent;
+      showToast("Rol görünümü değişti", `Ekran ${selectedRoleLabel} olarak gösteriliyor.`);
+    });
     els.bicarbToolButton.addEventListener("click", openBicarbonateTool);
     els.calciumToolButton.addEventListener("click", openCalciumTool);
     els.bicarbBackButton.addEventListener("click", () => goBackOrClose(goHome));
